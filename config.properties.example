@@ -1,0 +1,4 @@
+# PostgreSQL (usuario restrito do aplicativo)
+db.url=jdbc:postgresql://localhost:5432/manutencao_veiculos
+db.user=manutencao_app
+db.password=ALTERE_A_SENHA
