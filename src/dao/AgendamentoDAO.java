@@ -1,6 +1,7 @@
 package dao;
 
 import model.Agendamento;
+import util.AppException;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,7 +14,7 @@ import java.util.List;
 /** Acesso à tabela de relação agenda (carro x serviço). */
 public class AgendamentoDAO {
 
-    public List<Agendamento> listarPorCarro(int carroId) throws SQLException {
+    public List<Agendamento> listarPorCarro(int carroId) {
         String sql = "SELECT a.id, a.carro_id, a.servico_id, s.nome, s.preco, a.data_agendada, a.status "
                 + "FROM agenda a JOIN servico s ON s.id = a.servico_id "
                 + "WHERE a.carro_id = ? ORDER BY a.data_agendada, s.nome";
@@ -33,34 +34,22 @@ public class AgendamentoDAO {
                     lista.add(a);
                 }
             }
+        } catch (SQLException e) {
+            throw new AppException(e);
         }
         return lista;
     }
 
-    public void inserir(int carroId, int servicoId, Date data) throws SQLException {
-        String sql = "INSERT INTO agenda (carro_id, servico_id, data_agendada, status) VALUES (?, ?, ?, 'AGENDADO')";
-        try (Connection c = Conexao.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, carroId);
-            ps.setInt(2, servicoId);
-            ps.setDate(3, data);
-            ps.executeUpdate();
-        }
+    public void inserir(int carroId, int servicoId, Date data) {
+        Conexao.executar("INSERT INTO agenda (carro_id, servico_id, data_agendada, status) "
+                + "VALUES (?, ?, ?, 'AGENDADO')", carroId, servicoId, data);
     }
 
-    public void atualizarStatus(int id, String status) throws SQLException {
-        try (Connection c = Conexao.getConnection();
-             PreparedStatement ps = c.prepareStatement("UPDATE agenda SET status = ? WHERE id = ?")) {
-            ps.setString(1, status);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-        }
+    public void atualizarStatus(int id, String status) {
+        Conexao.executar("UPDATE agenda SET status = ? WHERE id = ?", status, id);
     }
 
-    public void excluir(int id) throws SQLException {
-        try (Connection c = Conexao.getConnection();
-             PreparedStatement ps = c.prepareStatement("DELETE FROM agenda WHERE id = ?")) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }
+    public void excluir(int id) {
+        Conexao.executar("DELETE FROM agenda WHERE id = ?", id);
     }
 }

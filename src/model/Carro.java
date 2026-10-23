@@ -1,5 +1,6 @@
 package model;
 
+/** Carro do cliente (tabela carro). Pode ter um mecânico atribuído. */
 public class Carro {
     private int id;
     private String placa;
@@ -7,8 +8,8 @@ public class Carro {
     private int ano;
     private int km;
     private String problema;
-    private int mecanicoId;          // 0 = nenhum mecânico atribuído
-    private String mecanicoNome;     // preenchido nas consultas (JOIN)
+    private int mecanicoId;       // chave estrangeira para mecanico (0 = nenhum)
+    private String mecanicoNome;  // preenchido nas consultas
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

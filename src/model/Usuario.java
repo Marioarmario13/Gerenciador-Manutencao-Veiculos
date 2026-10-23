@@ -1,5 +1,6 @@
 package model;
 
+/** Usuário que pode entrar no sistema (tabela usuario). */
 public class Usuario {
     private int id;
     private String login;

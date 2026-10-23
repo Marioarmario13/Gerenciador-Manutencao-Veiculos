@@ -3,6 +3,7 @@ package model;
 import java.math.BigDecimal;
 import util.Util;
 
+/** Serviço de manutenção oferecido (tabela servico). */
 public class Servico {
     private int id;
     private String nome;

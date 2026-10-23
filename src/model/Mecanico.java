@@ -1,5 +1,6 @@
 package model;
 
+/** Mecânico da oficina (tabela mecanico). Pode ser atribuído a vários carros. */
 public class Mecanico {
     private int id;
     private String nome;
@@ -18,7 +19,6 @@ public class Mecanico {
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
-    /** Texto exibido nos combos. */
     @Override
     public String toString() {
         return nome;

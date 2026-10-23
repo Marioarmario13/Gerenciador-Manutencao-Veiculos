@@ -1,6 +1,5 @@
 package view;
 
-import controller.AgendaController;
 import controller.CarroController;
 import model.Agendamento;
 import model.Carro;
@@ -18,14 +17,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Tela do carro: informações, problema, mecânico atribuído, serviços e agenda. */
+/** Cadastro de carros, mecânicos atribuídos e agenda de serviços. */
 public class CarrosView extends JFrame {
     private static final Mecanico NENHUM = criarNenhum();
 
     private final CarroController ctrl = new CarroController();
-    private final AgendaController agendaCtrl = new AgendaController();
 
-    // ----- busca e lista de carros -----
     private final JTextField txtBusca = new JTextField(14);
     private final JComboBox<String> cbOrdem1 = new JComboBox<>(ctrl.colunas());
     private final JComboBox<String> cbOrdem2 = new JComboBox<>(ctrl.colunas());
@@ -34,16 +31,14 @@ public class CarrosView extends JFrame {
     private final JTable tabelaCarros = UI.tabela(modeloCarros);
     private List<Carro> carros = new ArrayList<>();
 
-    // ----- formulário do carro -----
     private final JTextField txtPlaca = new JTextField();
     private final JTextField txtModelo = new JTextField();
     private final JTextField txtAno = new JTextField();
     private final JTextField txtKm = new JTextField();
     private final JTextField txtProblema = new JTextField();
     private final JComboBox<Mecanico> cbMecanico = new JComboBox<>();
-    private int idCarro = 0;   // 0 = novo carro
+    private int idCarro;
 
-    // ----- agenda e serviços do carro -----
     private final JLabel lblAgenda = new JLabel();
     private final DefaultTableModel modeloAgenda = UI.modelo("Serviço", "Preço", "Data", "Status");
     private final JTable tabelaAgenda = UI.tabela(modeloAgenda);
@@ -53,13 +48,12 @@ public class CarrosView extends JFrame {
     private final JLabel lblTotal = new JLabel();
 
     public CarrosView() {
-        super("Carros - Informações, Serviços e Agenda");
+        super("Carros e Agenda de Serviços");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(1040, 780);
+        setSize(900, 680);
         setLocationRelativeTo(null);
         cbOrdem2.setSelectedIndex(1);
 
-        // Ao voltar para esta janela, atualiza as listas de mecânicos e serviços
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
@@ -67,91 +61,68 @@ public class CarrosView extends JFrame {
             }
         });
 
-        // ---------- parte de cima: busca + tabela + formulário ----------
         JButton btnBuscar = new JButton("Buscar");
         JButton btnLimpar = new JButton("Limpar busca");
         btnBuscar.addActionListener(e -> recarregar());
         txtBusca.addActionListener(e -> recarregar());
-        btnLimpar.addActionListener(e -> { txtBusca.setText(""); recarregar(); });
+        btnLimpar.addActionListener(e -> txtBusca.setText(""));
+        UI.buscarAoDigitar(txtBusca, this::recarregar);
 
-        JPanel formulario = new JPanel(new GridLayout(3, 2, 10, 6));
-        formulario.add(UI.campo("Placa *", txtPlaca));
-        formulario.add(UI.campo("Modelo *", txtModelo));
-        formulario.add(UI.campo("Ano *", txtAno));
-        formulario.add(UI.campo("Quilometragem (km) *", txtKm));
-        formulario.add(UI.campo("Problema relatado", txtProblema));
-        formulario.add(UI.campo("Mecânico atribuído", cbMecanico));
-
-        JButton btnNovo = new JButton("Novo carro");
-        JButton btnSalvar = new JButton("Salvar carro");
-        JButton btnExcluir = new JButton("Excluir carro");
+        JButton btnNovo = new JButton("Novo");
+        JButton btnSalvar = new JButton("Salvar");
+        JButton btnExcluir = new JButton("Excluir");
         btnNovo.addActionListener(e -> limparForm());
         btnSalvar.addActionListener(e -> salvarCarro());
         btnExcluir.addActionListener(e -> excluirCarro());
-        JPanel botoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 2));
-        botoes.add(btnNovo);
-        botoes.add(btnSalvar);
-        botoes.add(btnExcluir);
 
-        JPanel painelForm = new JPanel(new BorderLayout(0, 4));
-        painelForm.setBorder(BorderFactory.createTitledBorder("Dados do carro (selecione uma linha para editar)"));
-        painelForm.add(formulario, BorderLayout.CENTER);
-        painelForm.add(botoes, BorderLayout.SOUTH);
-
-        JPanel topo = new JPanel(new BorderLayout(0, 6));
-        topo.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
-        topo.add(new JScrollPane(tabelaCarros), BorderLayout.CENTER);
-        topo.add(painelForm, BorderLayout.SOUTH);
+        JPanel abaCarro = new JPanel(new BorderLayout());
+        abaCarro.add(UI.grade(3,
+                "Placa *", txtPlaca, "Modelo *", txtModelo, "Ano *", txtAno,
+                "Km *", txtKm, "Problema", txtProblema, "Mecânico", cbMecanico), BorderLayout.NORTH);
+        abaCarro.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir), BorderLayout.SOUTH);
 
         tabelaCarros.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) selecionarCarro();
         });
 
-        // ---------- parte de baixo: serviços e agenda do carro ----------
-        JButton btnAgendar = new JButton("Agendar serviço");
-        JButton btnConcluir = new JButton("Marcar concluído");
-        JButton btnCancelar = new JButton("Cancelar serviço");
-        JButton btnRemover = new JButton("Remover da agenda");
+        JButton btnAgendar = new JButton("Agendar");
+        JButton btnConcluir = new JButton("Concluir");
+        JButton btnCancelar = new JButton("Cancelar");
+        JButton btnRemover = new JButton("Remover");
         btnAgendar.addActionListener(e -> agendar());
         btnConcluir.addActionListener(e -> mudarStatus(Agendamento.CONCLUIDO));
         btnCancelar.addActionListener(e -> mudarStatus(Agendamento.CANCELADO));
         btnRemover.addActionListener(e -> removerAgenda());
 
-        JPanel novoAgendamento = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        novoAgendamento.add(new JLabel("Serviço:"));
-        cbServico.setPrototypeDisplayValue(new Servico() {{ setNome("Alinhamento e balanceamento"); setPreco(BigDecimal.ZERO); }});
-        novoAgendamento.add(cbServico);
-        novoAgendamento.add(new JLabel("Data (dd/mm/aaaa):"));
-        novoAgendamento.add(txtData);
-        novoAgendamento.add(btnAgendar);
+        Servico exemplo = new Servico();
+        exemplo.setNome("Alinhamento e balanceamento");
+        exemplo.setPreco(BigDecimal.ZERO);
+        cbServico.setPrototypeDisplayValue(exemplo);
+        lblAgenda.setForeground(UI.AZUL);
+        lblTotal.setForeground(UI.VERMELHO);
 
-        JPanel acoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        acoes.add(btnConcluir);
-        acoes.add(btnCancelar);
-        acoes.add(btnRemover);
-        acoes.add(Box.createHorizontalStrut(20));
-        lblTotal.setFont(lblTotal.getFont().deriveFont(Font.BOLD));
-        acoes.add(lblTotal);
+        JPanel topoAgenda = new JPanel(new GridLayout(0, 1));
+        topoAgenda.add(UI.linha("Carro :", lblAgenda));
+        topoAgenda.add(UI.linha("Serviço :", cbServico, "Data :", txtData, btnAgendar));
 
-        JPanel controlesAgenda = new JPanel(new GridLayout(2, 1));
-        controlesAgenda.add(novoAgendamento);
-        controlesAgenda.add(acoes);
+        JPanel abaAgenda = new JPanel(new BorderLayout(0, 4));
+        abaAgenda.add(topoAgenda, BorderLayout.NORTH);
+        abaAgenda.add(UI.rolagem(tabelaAgenda), BorderLayout.CENTER);
+        abaAgenda.add(UI.barraBotoes(lblTotal, Box.createHorizontalStrut(20),
+                btnConcluir, btnCancelar, btnRemover), BorderLayout.SOUTH);
 
-        lblAgenda.setFont(lblAgenda.getFont().deriveFont(Font.BOLD, 14f));
-        JPanel baixo = new JPanel(new BorderLayout(0, 4));
-        baixo.setBorder(BorderFactory.createTitledBorder("Serviços e agenda do carro selecionado"));
-        baixo.add(lblAgenda, BorderLayout.NORTH);
-        baixo.add(new JScrollPane(tabelaAgenda), BorderLayout.CENTER);
-        baixo.add(controlesAgenda, BorderLayout.SOUTH);
+        JTabbedPane abas = new JTabbedPane();
+        abas.addTab("Dados do Carro", abaCarro);
+        abas.addTab("Agenda de Serviços", abaAgenda);
 
-        JSplitPane divisor = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topo, baixo);
-        divisor.setResizeWeight(0.58);
+        JSplitPane divisor = new JSplitPane(JSplitPane.VERTICAL_SPLIT, UI.rolagem(tabelaCarros), abas);
+        divisor.setResizeWeight(0.6);
         divisor.setBorder(null);
 
-        JPanel raiz = new JPanel(new BorderLayout());
-        raiz.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
-        raiz.add(divisor, BorderLayout.CENTER);
-        setContentPane(raiz);
+        JPanel conteudo = new JPanel(new BorderLayout(0, 4));
+        conteudo.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
+        conteudo.add(divisor, BorderLayout.CENTER);
+        setContentPane(UI.raiz(conteudo));
 
         carregarCombos();
         recarregar();
@@ -159,32 +130,27 @@ public class CarrosView extends JFrame {
     }
 
     private static Mecanico criarNenhum() {
-        Mecanico m = new Mecanico();
-        m.setId(0);
-        m.setNome("(sem mecânico)");
-        return m;
+        Mecanico mecanico = new Mecanico();
+        mecanico.setId(0);
+        mecanico.setNome("(sem mecânico)");
+        return mecanico;
     }
-
-    // ===================== combos =====================
 
     private void carregarCombos() {
         try {
-            Mecanico mecAnterior = (Mecanico) cbMecanico.getSelectedItem();
-            Servico servAnterior = (Servico) cbServico.getSelectedItem();
+            Mecanico mecanicoSelecionado = (Mecanico) cbMecanico.getSelectedItem();
+            Servico servicoSelecionado = (Servico) cbServico.getSelectedItem();
 
             cbMecanico.removeAllItems();
             cbMecanico.addItem(NENHUM);
-            for (Mecanico m : ctrl.mecanicosAtivos()) cbMecanico.addItem(m);
-            selecionarMecanico(mecAnterior);
+            for (Mecanico mecanico : ctrl.mecanicosAtivos()) cbMecanico.addItem(mecanico);
+            selecionarMecanico(mecanicoSelecionado);
 
             cbServico.removeAllItems();
-            for (Servico s : agendaCtrl.servicos()) cbServico.addItem(s);
-            if (servAnterior != null) {
-                for (int i = 0; i < cbServico.getItemCount(); i++) {
-                    if (cbServico.getItemAt(i).getId() == servAnterior.getId()) {
-                        cbServico.setSelectedIndex(i);
-                        break;
-                    }
+            for (Servico servico : ctrl.servicos()) {
+                cbServico.addItem(servico);
+                if (servicoSelecionado != null && servico.getId() == servicoSelecionado.getId()) {
+                    cbServico.setSelectedItem(servico);
                 }
             }
         } catch (AppException e) {
@@ -192,7 +158,6 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Seleciona o mecânico no combo; se ele estiver inativo, inclui na lista como "(inativo)". */
     private void selecionarMecanico(Mecanico alvo) {
         if (alvo == null || alvo.getId() == 0) {
             cbMecanico.setSelectedItem(NENHUM);
@@ -208,16 +173,15 @@ public class CarrosView extends JFrame {
         cbMecanico.setSelectedItem(alvo);
     }
 
-    // ===================== carros =====================
-
     private void recarregar() {
         try {
             carros = ctrl.listar(txtBusca.getText(), (String) cbOrdem1.getSelectedItem(),
                     (String) cbOrdem2.getSelectedItem());
             modeloCarros.setRowCount(0);
-            for (Carro c : carros) {
-                modeloCarros.addRow(new Object[]{c.getPlacaFormatada(), c.getModelo(), c.getAno(), c.getKm(),
-                        c.getProblema(), c.getMecanicoNome() == null ? "-" : c.getMecanicoNome()});
+            for (Carro carro : carros) {
+                modeloCarros.addRow(new Object[]{carro.getPlacaFormatada(), carro.getModelo(), carro.getAno(),
+                        carro.getKm(), carro.getProblema(),
+                        carro.getMecanicoNome() == null ? "-" : carro.getMecanicoNome()});
             }
         } catch (AppException e) {
             UI.erro(this, e.getMessage());
@@ -225,22 +189,23 @@ public class CarrosView extends JFrame {
     }
 
     private void selecionarCarro() {
-        int i = tabelaCarros.getSelectedRow();
-        if (i < 0 || i >= carros.size()) return;
-        Carro c = carros.get(i);
-        idCarro = c.getId();
-        txtPlaca.setText(c.getPlacaFormatada());
-        txtModelo.setText(c.getModelo());
-        txtAno.setText(String.valueOf(c.getAno()));
-        txtKm.setText(String.valueOf(c.getKm()));
-        txtProblema.setText(c.getProblema());
-        if (c.getMecanicoId() == 0) {
+        int linha = tabelaCarros.getSelectedRow();
+        if (linha < 0 || linha >= carros.size()) return;
+        Carro carro = carros.get(linha);
+        idCarro = carro.getId();
+        txtPlaca.setText(carro.getPlacaFormatada());
+        txtModelo.setText(carro.getModelo());
+        txtAno.setText(String.valueOf(carro.getAno()));
+        txtKm.setText(String.valueOf(carro.getKm()));
+        txtProblema.setText(carro.getProblema());
+
+        if (carro.getMecanicoId() == 0) {
             selecionarMecanico(null);
         } else {
-            Mecanico m = new Mecanico();
-            m.setId(c.getMecanicoId());
-            m.setNome(c.getMecanicoNome() + " (inativo)");   // só aparece se não estiver na lista de ativos
-            selecionarMecanico(m);
+            Mecanico mecanico = new Mecanico();
+            mecanico.setId(carro.getMecanicoId());
+            mecanico.setNome(carro.getMecanicoNome() + " (inativo)");
+            selecionarMecanico(mecanico);
         }
         carregarAgenda();
     }
@@ -285,26 +250,25 @@ public class CarrosView extends JFrame {
         }
     }
 
-    // ===================== agenda =====================
-
     private void carregarAgenda() {
         modeloAgenda.setRowCount(0);
+        agenda.clear();
         if (idCarro == 0) {
-            agenda = new ArrayList<>();
             lblAgenda.setText("Selecione um carro na tabela acima");
-            lblTotal.setText("Total previsto: " + Util.moeda(BigDecimal.ZERO));
+            lblTotal.setText("Total previsto : " + Util.moeda(BigDecimal.ZERO));
             return;
         }
+
         try {
-            agenda = agendaCtrl.listar(idCarro);
+            agenda = ctrl.listarAgenda(idCarro);
             BigDecimal total = BigDecimal.ZERO;
-            for (Agendamento a : agenda) {
-                modeloAgenda.addRow(new Object[]{a.getServicoNome(), Util.moeda(a.getPreco()),
-                        Util.formatData(a.getData()), a.getStatusTexto()});
-                if (Agendamento.AGENDADO.equals(a.getStatus())) total = total.add(a.getPreco());
+            for (Agendamento item : agenda) {
+                modeloAgenda.addRow(new Object[]{item.getServicoNome(), Util.moeda(item.getPreco()),
+                        Util.formatData(item.getData()), item.getStatusTexto()});
+                if (Agendamento.AGENDADO.equals(item.getStatus())) total = total.add(item.getPreco());
             }
             lblAgenda.setText(txtPlaca.getText() + " - " + txtModelo.getText());
-            lblTotal.setText("Total previsto (agendados): " + Util.moeda(total));
+            lblTotal.setText("Total previsto (agendados) : " + Util.moeda(total));
         } catch (AppException e) {
             UI.erro(this, e.getMessage());
         }
@@ -312,7 +276,7 @@ public class CarrosView extends JFrame {
 
     private void agendar() {
         try {
-            agendaCtrl.agendar(idCarro, (Servico) cbServico.getSelectedItem(), txtData.getText());
+            ctrl.agendar(idCarro, (Servico) cbServico.getSelectedItem(), txtData.getText());
             carregarAgenda();
         } catch (AppException e) {
             UI.erro(this, e.getMessage());
@@ -320,19 +284,19 @@ public class CarrosView extends JFrame {
     }
 
     private Agendamento agendamentoSelecionado() {
-        int i = tabelaAgenda.getSelectedRow();
-        if (i < 0 || i >= agenda.size()) {
+        int linha = tabelaAgenda.getSelectedRow();
+        if (linha < 0 || linha >= agenda.size()) {
             UI.erro(this, "Selecione um serviço na tabela da agenda.");
             return null;
         }
-        return agenda.get(i);
+        return agenda.get(linha);
     }
 
     private void mudarStatus(String status) {
-        Agendamento a = agendamentoSelecionado();
-        if (a == null) return;
+        Agendamento item = agendamentoSelecionado();
+        if (item == null) return;
         try {
-            agendaCtrl.mudarStatus(a.getId(), status);
+            ctrl.mudarStatus(item.getId(), status);
             carregarAgenda();
         } catch (AppException e) {
             UI.erro(this, e.getMessage());
@@ -340,11 +304,10 @@ public class CarrosView extends JFrame {
     }
 
     private void removerAgenda() {
-        Agendamento a = agendamentoSelecionado();
-        if (a == null) return;
-        if (!UI.confirmar(this, "Remover este serviço da agenda?")) return;
+        Agendamento item = agendamentoSelecionado();
+        if (item == null || !UI.confirmar(this, "Remover este serviço da agenda?")) return;
         try {
-            agendaCtrl.remover(a.getId());
+            ctrl.removerDaAgenda(item.getId());
             carregarAgenda();
         } catch (AppException e) {
             UI.erro(this, e.getMessage());

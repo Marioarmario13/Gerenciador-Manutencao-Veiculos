@@ -1,4 +1,4 @@
-# PostgreSQL (usuario restrito do aplicativo)
-db.url=jdbc:postgresql://localhost:5432/manutencao_veiculos
-db.user=manutencao_app
+# MySQL
+db.url=jdbc:mysql://localhost:3306/manutencao_veiculos
+db.user=root
 db.password=ALTERE_A_SENHA

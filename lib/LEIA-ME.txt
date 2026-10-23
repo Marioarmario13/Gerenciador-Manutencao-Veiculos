@@ -1,1 +1,0 @@
-Coloque aqui o mysql-connector-j-8.x.x.jar (veja o README.md)

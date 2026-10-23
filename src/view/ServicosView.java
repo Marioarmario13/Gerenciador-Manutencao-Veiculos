@@ -31,7 +31,7 @@ public class ServicosView extends JFrame {
     private int idAtual = 0;   // 0 = novo serviço
 
     public ServicosView() {
-        super("Serviços de Manutenção");
+        super("Cadastro de Serviços de Manutenção");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(920, 600);
         setLocationRelativeTo(null);
@@ -41,13 +41,8 @@ public class ServicosView extends JFrame {
         JButton btnLimpar = new JButton("Limpar busca");
         btnBuscar.addActionListener(e -> recarregar());
         txtBusca.addActionListener(e -> recarregar());
-        btnLimpar.addActionListener(e -> { txtBusca.setText(""); recarregar(); });
-
-        JPanel formulario = new JPanel(new GridLayout(2, 2, 10, 8));
-        formulario.add(UI.campo("Nome do serviço *", txtNome));
-        formulario.add(UI.campo("Preço (R$) *", txtPreco));
-        formulario.add(UI.campo("Descrição", txtDescricao));
-        formulario.add(UI.campo("Repetir a cada (km) *", txtIntervalo));
+        btnLimpar.addActionListener(e -> txtBusca.setText(""));
+        UI.buscarAoDigitar(txtBusca, this::recarregar);
 
         JButton btnNovo = new JButton("Novo");
         JButton btnSalvar = new JButton("Salvar");
@@ -55,26 +50,22 @@ public class ServicosView extends JFrame {
         btnNovo.addActionListener(e -> limpar());
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
-        JPanel botoes = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
-        botoes.add(btnNovo);
-        botoes.add(btnSalvar);
-        botoes.add(btnExcluir);
 
-        JPanel sul = new JPanel(new BorderLayout(0, 6));
-        sul.setBorder(BorderFactory.createTitledBorder("Dados do serviço (selecione uma linha para editar)"));
-        sul.add(formulario, BorderLayout.CENTER);
-        sul.add(botoes, BorderLayout.SOUTH);
+        JPanel sul = new JPanel(new BorderLayout());
+        sul.add(UI.secao("Dados do Serviço", UI.grade(2,
+                "Nome do serviço *", txtNome, "Preço (R$) *", txtPreco,
+                "Descrição", txtDescricao, "Repetir a cada (km) *", txtIntervalo)), BorderLayout.CENTER);
+        sul.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir), BorderLayout.SOUTH);
 
         tabela.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) selecionar();
         });
 
-        JPanel raiz = new JPanel(new BorderLayout(0, 8));
-        raiz.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
-        raiz.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
-        raiz.add(new JScrollPane(tabela), BorderLayout.CENTER);
-        raiz.add(sul, BorderLayout.SOUTH);
-        setContentPane(raiz);
+        JPanel conteudo = new JPanel(new BorderLayout(0, 4));
+        conteudo.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
+        conteudo.add(UI.rolagem(tabela), BorderLayout.CENTER);
+        conteudo.add(sul, BorderLayout.SOUTH);
+        setContentPane(UI.raiz(conteudo));
 
         recarregar();
     }
