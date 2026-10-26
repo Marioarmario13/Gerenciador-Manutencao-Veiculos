@@ -27,11 +27,11 @@ public class MecanicoDAO {
     public List<Mecanico> listar(String busca, String ordem1, String ordem2) {
         String sql = "SELECT id, nome, especialidade, telefone, ativo FROM mecanico "
                 + "WHERE nome LIKE ? OR especialidade LIKE ? OR telefone LIKE ? "
-                + "OR CAST(id AS CHAR) LIKE ? OR CAST(ativo AS CHAR) LIKE ? "
+                + "OR CAST(id AS CHAR) LIKE ? "
                 + "OR CASE WHEN ativo = TRUE THEN 'Sim' ELSE 'Não' END LIKE ? "
                 + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
         String filtro = "%" + (busca == null ? "" : busca.trim()) + "%";
-        return consultar(sql, filtro, 6);
+        return consultar(sql, filtro, 5);
     }
 
     /** Usado no combo "Mecânico" da tela de carros. */

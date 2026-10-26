@@ -28,6 +28,9 @@ public class AppException extends RuntimeException {
             return "Já existe um registro igual (valor duplicado), como uma placa já cadastrada "
                     + "ou o mesmo serviço na mesma data para o carro.";
         }
+        if (codigo == 1406) {
+            return "Um dos campos passou do tamanho máximo permitido. Use um texto mais curto.";
+        }
         if (codigo == 1044 || codigo == 1045 || "28000".equals(estado)) {
             return "Acesso negado ao MySQL. Confira usuário e senha no config.properties.";
         }

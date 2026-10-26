@@ -57,7 +57,12 @@ public class CarrosView extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
-                carregarCombos();
+                // atualiza os combos ao voltar para a tela (ex.: depois de cadastrar um serviço);
+                // aqui o erro não é mostrado, senão a mensagem reapareceria a cada vez que a janela ganha foco
+                try {
+                    carregarCombos();
+                } catch (AppException ignorada) {
+                }
             }
         });
 
@@ -124,7 +129,11 @@ public class CarrosView extends JFrame {
         conteudo.add(divisor, BorderLayout.CENTER);
         setContentPane(UI.raiz(conteudo));
 
-        carregarCombos();
+        try {
+            carregarCombos();
+        } catch (AppException e) {
+            UI.erro(this, e.getMessage());
+        }
         recarregar();
         carregarAgenda();
     }
@@ -136,25 +145,24 @@ public class CarrosView extends JFrame {
         return mecanico;
     }
 
+    /** Preenche os combos de mecânico e serviço, mantendo o que estava selecionado. */
     private void carregarCombos() {
-        try {
-            Mecanico mecanicoSelecionado = (Mecanico) cbMecanico.getSelectedItem();
-            Servico servicoSelecionado = (Servico) cbServico.getSelectedItem();
+        Mecanico mecanicoSelecionado = (Mecanico) cbMecanico.getSelectedItem();
+        Servico servicoSelecionado = (Servico) cbServico.getSelectedItem();
+        List<Mecanico> mecanicos = ctrl.mecanicosAtivos();
+        List<Servico> servicos = ctrl.servicos();
 
-            cbMecanico.removeAllItems();
-            cbMecanico.addItem(NENHUM);
-            for (Mecanico mecanico : ctrl.mecanicosAtivos()) cbMecanico.addItem(mecanico);
-            selecionarMecanico(mecanicoSelecionado);
+        cbMecanico.removeAllItems();
+        cbMecanico.addItem(NENHUM);
+        for (Mecanico mecanico : mecanicos) cbMecanico.addItem(mecanico);
+        selecionarMecanico(mecanicoSelecionado);
 
-            cbServico.removeAllItems();
-            for (Servico servico : ctrl.servicos()) {
-                cbServico.addItem(servico);
-                if (servicoSelecionado != null && servico.getId() == servicoSelecionado.getId()) {
-                    cbServico.setSelectedItem(servico);
-                }
+        cbServico.removeAllItems();
+        for (Servico servico : servicos) {
+            cbServico.addItem(servico);
+            if (servicoSelecionado != null && servico.getId() == servicoSelecionado.getId()) {
+                cbServico.setSelectedItem(servico);
             }
-        } catch (AppException e) {
-            UI.erro(this, e.getMessage());
         }
     }
 

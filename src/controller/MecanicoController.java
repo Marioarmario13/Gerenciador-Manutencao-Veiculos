@@ -24,7 +24,8 @@ public class MecanicoController {
         if (Util.vazio(nome)) throw new AppException("O nome do mecânico é obrigatório.");
         if (Util.vazio(telefone)) throw new AppException("O telefone é obrigatório.");
         int digitos = telefone.replaceAll("\\D", "").length();
-        if (digitos != 10 && digitos != 11) {
+        // só aceita números, espaço, parênteses e hífen, com 10 ou 11 dígitos
+        if (!telefone.matches("[0-9()\\-\\s]+") || (digitos != 10 && digitos != 11)) {
             throw new AppException("Telefone inválido. Informe DDD + número (10 ou 11 dígitos).");
         }
 

@@ -9,11 +9,11 @@ import java.awt.*;
 /** Tela de login. */
 public class LoginView extends JFrame {
     private final AuthController ctrl = new AuthController();
-    private final JTextField txtLogin = new JTextField(18);
-    private final JPasswordField txtSenha = new JPasswordField(18);
+    private final JTextField txtLogin = new JTextField(26);
+    private final JPasswordField txtSenha = new JPasswordField(26);
 
     public LoginView() {
-        super("MANU0001 - Acesso ao Sistema");
+        super("ManuPrev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -24,8 +24,9 @@ public class LoginView extends JFrame {
         getRootPane().setDefaultButton(btnEntrar);
 
         JPanel conteudo = new JPanel(new BorderLayout(0, 6));
-        conteudo.add(UI.secao("Acesso ao Sistema",
-                UI.grade(1, "Usuário", txtLogin, "Senha", txtSenha)), BorderLayout.CENTER);
+        JPanel campos = UI.grade(1, "Usuário", txtLogin, "Senha", txtSenha);
+        campos.setBorder(BorderFactory.createEmptyBorder(14, 12, 14, 12));
+        conteudo.add(UI.secao("Acesso ao Sistema", campos), BorderLayout.CENTER);
         conteudo.add(UI.barraBotoes(btnEntrar, btnSair), BorderLayout.SOUTH);
         setContentPane(UI.raiz(conteudo));
 

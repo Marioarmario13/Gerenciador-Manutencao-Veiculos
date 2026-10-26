@@ -10,7 +10,7 @@ public class PrincipalView extends JFrame {
     private CarrosView carros;
 
     public PrincipalView() {
-        super("MANU0000 - Gestão de Manutenção Preventiva de Veículos");
+        super("ManuPrev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JButton btnCarros = new JButton("Carros e Agenda de Serviços");
