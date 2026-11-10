@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Acesso à tabela carro (listar, inserir, atualizar e excluir). */
-public class CarroDAO {
+public class CarroDAO implements DAO<Carro> {
 
     /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
     public static final Map<String, String> COLUNAS = new LinkedHashMap<>();
@@ -26,6 +26,7 @@ public class CarroDAO {
         COLUNAS.put("Código", "c.id");
     }
 
+    @Override
     public List<Carro> listar(String busca, String ordem1, String ordem2) {
         String sql = "SELECT c.id, c.placa, c.modelo, c.ano, c.km, c.problema, "
                 + "c.mecanico_id, m.nome AS mecanico_nome FROM carro c "
@@ -60,11 +61,13 @@ public class CarroDAO {
         return lista;
     }
 
+    @Override
     public void inserir(Carro car) {
         Conexao.executar("INSERT INTO carro (placa, modelo, ano, km, problema, mecanico_id) VALUES (?, ?, ?, ?, ?, ?)",
                 car.getPlaca(), car.getModelo(), car.getAno(), car.getKm(), car.getProblema(), mecanico(car));
     }
 
+    @Override
     public void atualizar(Carro car) {
         Conexao.executar("UPDATE carro SET placa = ?, modelo = ?, ano = ?, km = ?, problema = ?, mecanico_id = ? WHERE id = ?",
                 car.getPlaca(), car.getModelo(), car.getAno(), car.getKm(), car.getProblema(), mecanico(car),
@@ -77,6 +80,7 @@ public class CarroDAO {
     }
 
     /** Remove o carro e sua agenda (ON DELETE CASCADE). */
+    @Override
     public void excluir(int id) {
         Conexao.executar("DELETE FROM carro WHERE id = ?", id);
     }

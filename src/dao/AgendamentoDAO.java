@@ -11,7 +11,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Acesso à tabela de relação agenda (carro x serviço). */
+/**
+ * Acesso à tabela de relação agenda (carro x serviço).
+ * Não implementa DAO<T> porque a agenda não é um cadastro: ela é listada por carro
+ * e tem operações próprias (agendar e mudar o status).
+ */
 public class AgendamentoDAO {
 
     public List<Agendamento> listarPorCarro(int carroId) {

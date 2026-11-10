@@ -1,5 +1,6 @@
 package controller;
 
+import dao.DAO;
 import dao.MecanicoDAO;
 import model.Mecanico;
 import util.AppException;
@@ -9,7 +10,8 @@ import java.util.List;
 
 /** Regras da tela de mecânicos: valida os dados e chama o MecanicoDAO. */
 public class MecanicoController {
-    private final MecanicoDAO dao = new MecanicoDAO();
+    // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
+    private final DAO<Mecanico> dao = new MecanicoDAO();
 
     public String[] colunas() {
         return MecanicoDAO.COLUNAS.keySet().toArray(new String[0]);

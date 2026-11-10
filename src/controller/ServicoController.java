@@ -1,5 +1,6 @@
 package controller;
 
+import dao.DAO;
 import dao.ServicoDAO;
 import model.Servico;
 import util.AppException;
@@ -9,7 +10,8 @@ import java.util.List;
 
 /** Regras da tela de serviços: valida os dados e chama o ServicoDAO. */
 public class ServicoController {
-    private final ServicoDAO dao = new ServicoDAO();
+    // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
+    private final DAO<Servico> dao = new ServicoDAO();
 
     public String[] colunas() {
         return ServicoDAO.COLUNAS.keySet().toArray(new String[0]);

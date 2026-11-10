@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Acesso à tabela mecanico (listar, inserir, atualizar e excluir). */
-public class MecanicoDAO {
+public class MecanicoDAO implements DAO<Mecanico> {
 
     /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
     public static final Map<String, String> COLUNAS = new LinkedHashMap<>();
@@ -24,6 +24,7 @@ public class MecanicoDAO {
         COLUNAS.put("Código", "id");
     }
 
+    @Override
     public List<Mecanico> listar(String busca, String ordem1, String ordem2) {
         String sql = "SELECT id, nome, especialidade, telefone, ativo FROM mecanico "
                 + "WHERE nome LIKE ? OR especialidade LIKE ? OR telefone LIKE ? "
@@ -62,16 +63,19 @@ public class MecanicoDAO {
         return lista;
     }
 
+    @Override
     public void inserir(Mecanico m) {
         Conexao.executar("INSERT INTO mecanico (nome, especialidade, telefone, ativo) VALUES (?, ?, ?, ?)",
                 m.getNome(), m.getEspecialidade(), m.getTelefone(), m.isAtivo());
     }
 
+    @Override
     public void atualizar(Mecanico m) {
         Conexao.executar("UPDATE mecanico SET nome = ?, especialidade = ?, telefone = ?, ativo = ? WHERE id = ?",
                 m.getNome(), m.getEspecialidade(), m.getTelefone(), m.isAtivo(), m.getId());
     }
 
+    @Override
     public void excluir(int id) {
         Conexao.executar("DELETE FROM mecanico WHERE id = ?", id);
     }

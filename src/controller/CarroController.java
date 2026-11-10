@@ -2,6 +2,7 @@ package controller;
 
 import dao.AgendamentoDAO;
 import dao.CarroDAO;
+import dao.DAO;
 import dao.MecanicoDAO;
 import dao.ServicoDAO;
 import model.Agendamento;
@@ -18,9 +19,11 @@ import java.util.List;
 
 /** Regras da tela de carros: cadastro do carro e sua agenda de serviços. */
 public class CarroController {
-    private final CarroDAO dao = new CarroDAO();
+    // carros e serviços são usados pela interface DAO; mecânico e agenda usam métodos próprios
+    // (listarAtivos e listarPorCarro), por isso ficam com a classe concreta
+    private final DAO<Carro> dao = new CarroDAO();
     private final MecanicoDAO mecanicoDAO = new MecanicoDAO();
-    private final ServicoDAO servicoDAO = new ServicoDAO();
+    private final DAO<Servico> servicoDAO = new ServicoDAO();
     private final AgendamentoDAO agendaDAO = new AgendamentoDAO();
 
     // ---------- Carros ----------

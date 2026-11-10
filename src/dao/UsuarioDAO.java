@@ -11,7 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/** Acesso à tabela usuario (login). */
+/**
+ * Acesso à tabela usuario (login).
+ * Não implementa DAO<T> porque não é um cadastro: o sistema só confere login e senha.
+ */
 public class UsuarioDAO {
 
     /** Retorna o usuário com esse login e senha, ou null se não existir. */
