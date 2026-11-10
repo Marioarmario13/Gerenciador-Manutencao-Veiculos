@@ -30,6 +30,7 @@ public class ServicosView extends JFrame {
     private List<Servico> dados = new ArrayList<>();
     private int idAtual = 0;   // 0 = novo serviço
 
+    /** Monta a tela: pesquisa, lista de serviços e formulário de dados. */
     public ServicosView() {
         super("Cadastro de Serviços de Manutenção");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -72,6 +73,7 @@ public class ServicosView extends JFrame {
         recarregar();
     }
 
+    /** Busca os serviços no controller e preenche a tabela. */
     private void recarregar() {
         try {
             dados = ctrl.listar(txtBusca.getText(), (String) cbOrdem1.getSelectedItem(),
@@ -86,6 +88,7 @@ public class ServicosView extends JFrame {
         }
     }
 
+    /** Copia o serviço selecionado na tabela para o formulário. */
     private void selecionar() {
         int i = tabela.getSelectedRow();
         if (i < 0 || i >= dados.size()) return;
@@ -97,6 +100,7 @@ public class ServicosView extends JFrame {
         txtIntervalo.setText(String.valueOf(s.getIntervaloKm()));
     }
 
+    /** Limpa o formulário para cadastrar um serviço novo. */
     private void limpar() {
         idAtual = 0;
         tabela.clearSelection();
@@ -107,6 +111,7 @@ public class ServicosView extends JFrame {
         txtNome.requestFocus();
     }
 
+    /** Envia o formulário ao controller para inserir ou alterar o serviço. */
     private void salvar() {
         try {
             ctrl.salvar(idAtual, txtNome.getText(), txtDescricao.getText(), txtPreco.getText(), txtIntervalo.getText());
@@ -118,6 +123,7 @@ public class ServicosView extends JFrame {
         }
     }
 
+    /** Pede confirmação e exclui o serviço selecionado. */
     private void excluir() {
         if (idAtual == 0) {
             UI.erro(this, "Selecione um serviço na tabela para excluir.");

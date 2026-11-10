@@ -13,10 +13,12 @@ public class ServicoController {
     // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
     private final DAO<Servico> dao = new ServicoDAO();
 
+    /** Colunas que a tela oferece para ordenar a lista de serviços. */
     public String[] colunas() {
         return dao.colunas();
     }
 
+    /** Lista os serviços que contêm a busca, ordenados pelos critérios escolhidos. */
     public List<Servico> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
@@ -34,6 +36,7 @@ public class ServicoController {
         else dao.atualizar(s);
     }
 
+    /** Exclui o serviço; o banco bloqueia se ele estiver em alguma agenda (RESTRICT). */
     public void excluir(int id) {
         dao.excluir(id);
     }

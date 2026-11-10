@@ -13,10 +13,12 @@ public class MecanicoController {
     // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
     private final DAO<Mecanico> dao = new MecanicoDAO();
 
+    /** Colunas que a tela oferece para ordenar a lista de mecânicos. */
     public String[] colunas() {
         return dao.colunas();
     }
 
+    /** Lista os mecânicos que contêm a busca, ordenados pelos critérios escolhidos. */
     public List<Mecanico> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
@@ -41,6 +43,7 @@ public class MecanicoController {
         else dao.atualizar(mecanico);
     }
 
+    /** Exclui o mecânico; o banco bloqueia se ele estiver atribuído a um carro (RESTRICT). */
     public void excluir(int id) {
         dao.excluir(id);
     }

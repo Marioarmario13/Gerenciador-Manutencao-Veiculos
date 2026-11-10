@@ -37,6 +37,7 @@ public class Conexao {
         }
     }
 
+    /** Abre uma nova conexão com o MySQL usando os dados do config.properties. */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, usuario, senha);
     }

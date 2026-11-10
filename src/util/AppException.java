@@ -5,6 +5,7 @@ import java.sql.SQLException;
 /** Erro com mensagem pronta para mostrar ao usuário (validação ou erro do banco). */
 public class AppException extends RuntimeException {
 
+    /** Erro de validação, com a mensagem já pronta para o usuário. */
     public AppException(String mensagem) {
         super(mensagem);
     }
@@ -14,6 +15,7 @@ public class AppException extends RuntimeException {
         super(traduzir(e));
     }
 
+    /** Escolhe a mensagem de acordo com o código de erro do MySQL. */
     private static String traduzir(SQLException e) {
         String estado = e.getSQLState();
         int codigo = e.getErrorCode();

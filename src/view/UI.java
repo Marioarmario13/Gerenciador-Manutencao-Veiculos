@@ -130,6 +130,7 @@ public class UI {
             g.dispose();
         }
 
+        /** Desenha o símbolo (!, i ou ?) centralizado no ícone. */
         private static void simbolo(Graphics2D g, String texto, Color cor, int base) {
             g.setFont(new Font("Times New Roman", Font.BOLD, 20));
             g.setColor(cor);
@@ -140,6 +141,7 @@ public class UI {
         }
     }
 
+    /** Executa a ação a cada letra digitada no campo (busca enquanto digita). */
     static void buscarAoDigitar(JTextField campo, Runnable acao) {
         campo.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -159,14 +161,17 @@ public class UI {
         });
     }
 
+    /** Mostra uma caixa de aviso com a mensagem. */
     static void erro(Component pai, String mensagem) {
         JOptionPane.showMessageDialog(pai, mensagem, "Atenção", JOptionPane.WARNING_MESSAGE);
     }
 
+    /** Mostra uma caixa de informação com a mensagem. */
     static void info(Component pai, String mensagem) {
         JOptionPane.showMessageDialog(pai, mensagem, "Informação", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /** Pergunta Sim/Não e retorna true se o usuário confirmar. */
     static boolean confirmar(Component pai, String mensagem) {
         return JOptionPane.showConfirmDialog(pai, mensagem, "Confirmação",
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
@@ -182,6 +187,7 @@ public class UI {
         };
     }
 
+    /** Cria uma tabela de seleção única, sem reordenar colunas. */
     static JTable tabela(DefaultTableModel modelo) {
         JTable t = new JTable(modelo);
         t.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -192,6 +198,7 @@ public class UI {
         return t;
     }
 
+    /** Coloca a tabela dentro de uma área de rolagem com borda. */
     static JScrollPane rolagem(JTable tabela) {
         JScrollPane s = new JScrollPane(tabela);
         s.setBorder(BorderFactory.createLoweredBevelBorder());

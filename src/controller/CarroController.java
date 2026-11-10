@@ -12,6 +12,7 @@ import model.Servico;
 import util.AppException;
 import util.Util;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Year;
@@ -28,10 +29,12 @@ public class CarroController {
 
     // ---------- Carros ----------
 
+    /** Colunas que a tela oferece para ordenar a lista de carros. */
     public String[] colunas() {
         return dao.colunas();
     }
 
+    /** Lista os carros que contêm a busca, ordenados pelos critérios escolhidos. */
     public List<Carro> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
@@ -67,12 +70,14 @@ public class CarroController {
         else dao.atualizar(c);
     }
 
+    /** Exclui o carro; a agenda dele é apagada junto (CASCADE no banco). */
     public void excluir(int id) {
         dao.excluir(id);
     }
 
     // ---------- Agenda de serviços do carro ----------
 
+    /** Serviços em ordem de nome, para o combo da agenda. */
     public List<Servico> servicos() {
         return servicoDAO.listar("", "Nome", null);
     }
@@ -86,6 +91,16 @@ public class CarroController {
         return doCarro;
     }
 
+    /** Soma o preço dos serviços ainda agendados (os concluídos e cancelados não entram). */
+    public BigDecimal totalPrevisto(List<Agendamento> agenda) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (Agendamento a : agenda) {
+            if (Agendamento.AGENDADO.equals(a.getStatus())) total = total.add(a.getPreco());
+        }
+        return total;
+    }
+
+    /** Valida o serviço e a data (que não pode estar no passado) e grava o agendamento. */
     public void agendar(int carroId, Servico servico, String data) {
         if (carroId == 0) throw new AppException("Selecione um carro na tabela primeiro.");
         if (servico == null) throw new AppException("Selecione um serviço.");
@@ -107,6 +122,7 @@ public class CarroController {
         agendaDAO.atualizar(agendamento);
     }
 
+    /** Remove um serviço da agenda do carro. */
     public void removerDaAgenda(int agendamentoId) {
         agendaDAO.excluir(agendamentoId);
     }

@@ -32,6 +32,7 @@ public class Agendamento {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    /** Status escrito para a tela, com acento: Agendado, Concluído ou Cancelado. */
     public String getStatusTexto() {
         if (CONCLUIDO.equals(status)) return "Concluído";
         if (CANCELADO.equals(status)) return "Cancelado";
