@@ -307,7 +307,7 @@ public class CarrosView extends JFrame {
         Agendamento item = agendamentoSelecionado();
         if (item == null) return;
         try {
-            ctrl.mudarStatus(item.getId(), status);
+            ctrl.mudarStatus(item, status);
             carregarAgenda();
         } catch (AppException e) {
             UI.erro(this, e.getMessage());

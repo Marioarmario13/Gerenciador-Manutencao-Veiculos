@@ -3,14 +3,17 @@ package dao;
 import java.util.List;
 
 /**
- * Interface DAO (Data Access Object): o contrato de CRUD das tabelas de cadastro.
+ * Interface DAO (Data Access Object): o contrato que toda classe de acesso a uma tabela cumpre.
  * O <T> é o tipo da entidade, então o mesmo contrato serve para CarroDAO (DAO<Carro>),
- * ServicoDAO (DAO<Servico>) e MecanicoDAO (DAO<Mecanico>). Os controllers usam esta
- * interface, sem depender de como cada DAO monta o seu SQL.
+ * ServicoDAO (DAO<Servico>), MecanicoDAO (DAO<Mecanico>) e AgendamentoDAO (DAO<Agendamento>).
+ * Os controllers conhecem só esta interface: não sabem como cada DAO monta o seu SQL.
  */
 public interface DAO<T> {
 
-    /** Lista os registros que contêm a busca, ordenados por até dois critérios (colunas da tela). */
+    /** Rótulos das colunas que a tela pode usar para ordenar a lista (ex.: "Nome", "Preço"). */
+    String[] colunas();
+
+    /** Lista os registros que contêm a busca, ordenados por até dois critérios de colunas(). */
     List<T> listar(String busca, String ordem1, String ordem2);
 
     /** Grava um novo registro (INSERT). */

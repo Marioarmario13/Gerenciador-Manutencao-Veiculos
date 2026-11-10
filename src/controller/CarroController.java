@@ -15,29 +15,34 @@ import util.Util;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 
 /** Regras da tela de carros: cadastro do carro e sua agenda de serviços. */
 public class CarroController {
-    // carros e serviços são usados pela interface DAO; mecânico e agenda usam métodos próprios
-    // (listarAtivos e listarPorCarro), por isso ficam com a classe concreta
+    // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
     private final DAO<Carro> dao = new CarroDAO();
-    private final MecanicoDAO mecanicoDAO = new MecanicoDAO();
+    private final DAO<Mecanico> mecanicoDAO = new MecanicoDAO();
     private final DAO<Servico> servicoDAO = new ServicoDAO();
-    private final AgendamentoDAO agendaDAO = new AgendamentoDAO();
+    private final DAO<Agendamento> agendaDAO = new AgendamentoDAO();
 
     // ---------- Carros ----------
 
     public String[] colunas() {
-        return CarroDAO.COLUNAS.keySet().toArray(new String[0]);
+        return dao.colunas();
     }
 
     public List<Carro> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
 
+    /** Mecânicos em atividade, em ordem de nome (para o combo "Mecânico"). */
     public List<Mecanico> mecanicosAtivos() {
-        return mecanicoDAO.listarAtivos();
+        List<Mecanico> ativos = new ArrayList<>();
+        for (Mecanico m : mecanicoDAO.listar("", "Nome", null)) {
+            if (m.isAtivo()) ativos.add(m);
+        }
+        return ativos;
     }
 
     /** id == 0 insere um novo carro; id > 0 atualiza o existente. */
@@ -72,8 +77,13 @@ public class CarroController {
         return servicoDAO.listar("", "Nome", null);
     }
 
+    /** Agenda de um carro, em ordem de data e depois de serviço. */
     public List<Agendamento> listarAgenda(int carroId) {
-        return agendaDAO.listarPorCarro(carroId);
+        List<Agendamento> doCarro = new ArrayList<>();
+        for (Agendamento a : agendaDAO.listar("", "Data", "Serviço")) {
+            if (a.getCarroId() == carroId) doCarro.add(a);
+        }
+        return doCarro;
     }
 
     public void agendar(int carroId, Servico servico, String data) {
@@ -83,11 +93,18 @@ public class CarroController {
         if (d.toLocalDate().isBefore(LocalDate.now())) {
             throw new AppException("A data do agendamento não pode estar no passado.");
         }
-        agendaDAO.inserir(carroId, servico.getId(), d);
+        Agendamento a = new Agendamento();
+        a.setCarroId(carroId);
+        a.setServicoId(servico.getId());
+        a.setData(d);
+        a.setStatus(Agendamento.AGENDADO);
+        agendaDAO.inserir(a);
     }
 
-    public void mudarStatus(int agendamentoId, String status) {
-        agendaDAO.atualizarStatus(agendamentoId, status);
+    /** Marca o agendamento como concluído ou cancelado. */
+    public void mudarStatus(Agendamento agendamento, String status) {
+        agendamento.setStatus(status);
+        agendaDAO.atualizar(agendamento);
     }
 
     public void removerDaAgenda(int agendamentoId) {

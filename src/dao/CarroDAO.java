@@ -12,11 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela carro (listar, inserir, atualizar e excluir). */
+/** Acesso à tabela carro: implementa o contrato DAO<Carro>. */
 public class CarroDAO implements DAO<Carro> {
 
     /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
-    public static final Map<String, String> COLUNAS = new LinkedHashMap<>();
+    private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Placa", "c.placa");
         COLUNAS.put("Modelo", "c.modelo");
@@ -24,6 +24,11 @@ public class CarroDAO implements DAO<Carro> {
         COLUNAS.put("Km", "c.km");
         COLUNAS.put("Mecânico", "m.nome");
         COLUNAS.put("Código", "c.id");
+    }
+
+    @Override
+    public String[] colunas() {
+        return COLUNAS.keySet().toArray(new String[0]);
     }
 
     @Override

@@ -12,16 +12,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela mecanico (listar, inserir, atualizar e excluir). */
+/** Acesso à tabela mecanico: implementa o contrato DAO<Mecanico>. */
 public class MecanicoDAO implements DAO<Mecanico> {
 
     /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
-    public static final Map<String, String> COLUNAS = new LinkedHashMap<>();
+    private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Nome", "nome");
         COLUNAS.put("Especialidade", "especialidade");
         COLUNAS.put("Em atividade", "ativo");
         COLUNAS.put("Código", "id");
+    }
+
+    @Override
+    public String[] colunas() {
+        return COLUNAS.keySet().toArray(new String[0]);
     }
 
     @Override
@@ -31,21 +36,10 @@ public class MecanicoDAO implements DAO<Mecanico> {
                 + "OR CAST(id AS CHAR) LIKE ? "
                 + "OR CASE WHEN ativo = TRUE THEN 'Sim' ELSE 'Não' END LIKE ? "
                 + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
-        String filtro = "%" + (busca == null ? "" : busca.trim()) + "%";
-        return consultar(sql, filtro, 5);
-    }
-
-    /** Usado no combo "Mecânico" da tela de carros. */
-    public List<Mecanico> listarAtivos() {
-        return consultar("SELECT id, nome, especialidade, telefone, ativo FROM mecanico "
-                + "WHERE ativo = TRUE ORDER BY nome", null, 0);
-    }
-
-    /** Executa o SELECT, preenchendo os "?" com o filtro, e monta a lista de mecânicos. */
-    private List<Mecanico> consultar(String sql, String filtro, int quantidade) {
         List<Mecanico> lista = new ArrayList<>();
         try (Connection conexao = Conexao.getConnection(); PreparedStatement ps = conexao.prepareStatement(sql)) {
-            for (int i = 1; i <= quantidade; i++) ps.setString(i, filtro);
+            String filtro = "%" + (busca == null ? "" : busca.trim()) + "%";
+            for (int i = 1; i <= 5; i++) ps.setString(i, filtro);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Mecanico mecanico = new Mecanico();

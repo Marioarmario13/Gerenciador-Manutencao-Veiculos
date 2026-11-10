@@ -14,7 +14,7 @@ public class MecanicoController {
     private final DAO<Mecanico> dao = new MecanicoDAO();
 
     public String[] colunas() {
-        return MecanicoDAO.COLUNAS.keySet().toArray(new String[0]);
+        return dao.colunas();
     }
 
     public List<Mecanico> listar(String busca, String ordem1, String ordem2) {

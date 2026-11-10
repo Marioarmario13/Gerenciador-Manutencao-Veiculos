@@ -4,27 +4,42 @@ import model.Agendamento;
 import util.AppException;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Acesso à tabela de relação agenda (carro x serviço).
- * Não implementa DAO<T> porque a agenda não é um cadastro: ela é listada por carro
- * e tem operações próprias (agendar e mudar o status).
- */
-public class AgendamentoDAO {
+/** Acesso à tabela de relação agenda (carro x serviço): implementa o contrato DAO<Agendamento>. */
+public class AgendamentoDAO implements DAO<Agendamento> {
 
-    public List<Agendamento> listarPorCarro(int carroId) {
+    /** Critérios de ordenação disponíveis (rótulo -> coluna SQL). */
+    private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
+    static {
+        COLUNAS.put("Data", "a.data_agendada");
+        COLUNAS.put("Serviço", "s.nome");
+        COLUNAS.put("Placa", "c.placa");
+        COLUNAS.put("Status", "a.status");
+        COLUNAS.put("Código", "a.id");
+    }
+
+    @Override
+    public String[] colunas() {
+        return COLUNAS.keySet().toArray(new String[0]);
+    }
+
+    @Override
+    public List<Agendamento> listar(String busca, String ordem1, String ordem2) {
         String sql = "SELECT a.id, a.carro_id, a.servico_id, s.nome, s.preco, a.data_agendada, a.status "
-                + "FROM agenda a JOIN servico s ON s.id = a.servico_id "
-                + "WHERE a.carro_id = ? ORDER BY a.data_agendada, s.nome";
+                + "FROM agenda a JOIN carro c ON c.id = a.carro_id JOIN servico s ON s.id = a.servico_id "
+                + "WHERE c.placa LIKE ? OR s.nome LIKE ? OR a.status LIKE ?"
+                + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
         List<Agendamento> lista = new ArrayList<>();
         try (Connection c = Conexao.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, carroId);
+            String filtro = "%" + (busca == null ? "" : busca.trim()) + "%";
+            for (int i = 1; i <= 3; i++) ps.setString(i, filtro);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Agendamento a = new Agendamento();
@@ -44,15 +59,19 @@ public class AgendamentoDAO {
         return lista;
     }
 
-    public void inserir(int carroId, int servicoId, Date data) {
-        Conexao.executar("INSERT INTO agenda (carro_id, servico_id, data_agendada, status) "
-                + "VALUES (?, ?, ?, 'AGENDADO')", carroId, servicoId, data);
+    @Override
+    public void inserir(Agendamento a) {
+        Conexao.executar("INSERT INTO agenda (carro_id, servico_id, data_agendada, status) VALUES (?, ?, ?, ?)",
+                a.getCarroId(), a.getServicoId(), a.getData(), a.getStatus());
     }
 
-    public void atualizarStatus(int id, String status) {
-        Conexao.executar("UPDATE agenda SET status = ? WHERE id = ?", status, id);
+    @Override
+    public void atualizar(Agendamento a) {
+        Conexao.executar("UPDATE agenda SET carro_id = ?, servico_id = ?, data_agendada = ?, status = ? WHERE id = ?",
+                a.getCarroId(), a.getServicoId(), a.getData(), a.getStatus(), a.getId());
     }
 
+    @Override
     public void excluir(int id) {
         Conexao.executar("DELETE FROM agenda WHERE id = ?", id);
     }

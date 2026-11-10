@@ -12,16 +12,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela servico (listar, inserir, atualizar e excluir). */
+/** Acesso à tabela servico: implementa o contrato DAO<Servico>. */
 public class ServicoDAO implements DAO<Servico> {
 
     /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
-    public static final Map<String, String> COLUNAS = new LinkedHashMap<>();
+    private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Nome", "nome");
         COLUNAS.put("Preço", "preco");
         COLUNAS.put("Intervalo (km)", "intervalo_km");
         COLUNAS.put("Código", "id");
+    }
+
+    @Override
+    public String[] colunas() {
+        return COLUNAS.keySet().toArray(new String[0]);
     }
 
     @Override

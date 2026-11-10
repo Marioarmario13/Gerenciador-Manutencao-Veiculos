@@ -14,7 +14,7 @@ public class ServicoController {
     private final DAO<Servico> dao = new ServicoDAO();
 
     public String[] colunas() {
-        return ServicoDAO.COLUNAS.keySet().toArray(new String[0]);
+        return dao.colunas();
     }
 
     public List<Servico> listar(String busca, String ordem1, String ordem2) {
