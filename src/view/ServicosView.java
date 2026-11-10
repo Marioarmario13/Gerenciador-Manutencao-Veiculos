@@ -50,12 +50,14 @@ public class ServicosView extends JFrame {
         btnNovo.addActionListener(e -> limpar());
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
 
         JPanel sul = new JPanel(new BorderLayout());
         sul.add(UI.secao("Dados do Serviço", UI.grade(2,
                 "Nome do serviço *", txtNome, "Preço (R$) *", txtPreco,
                 "Descrição", txtDescricao, "Repetir a cada (km) *", txtIntervalo)), BorderLayout.CENTER);
-        sul.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir), BorderLayout.SOUTH);
+        sul.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir, Box.createHorizontalStrut(20), btnVoltar), BorderLayout.SOUTH);
 
         tabela.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) selecionar();

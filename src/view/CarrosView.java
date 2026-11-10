@@ -79,6 +79,8 @@ public class CarrosView extends JFrame {
         btnNovo.addActionListener(e -> limparForm());
         btnSalvar.addActionListener(e -> salvarCarro());
         btnExcluir.addActionListener(e -> excluirCarro());
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
 
         JPanel abaCarro = new JPanel(new BorderLayout());
         abaCarro.add(UI.grade(3,
@@ -127,6 +129,7 @@ public class CarrosView extends JFrame {
         JPanel conteudo = new JPanel(new BorderLayout(0, 4));
         conteudo.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
         conteudo.add(divisor, BorderLayout.CENTER);
+        conteudo.add(UI.barraBotoes(btnVoltar), BorderLayout.SOUTH);
         setContentPane(UI.raiz(conteudo));
 
         try {

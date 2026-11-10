@@ -47,12 +47,14 @@ public class MecanicosView extends JFrame {
         btnNovo.addActionListener(e -> limpar());
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
 
         JPanel dadosMecanico = new JPanel(new BorderLayout());
         dadosMecanico.add(UI.secao("Dados do Mecânico", UI.grade(2,
                 "Nome *", txtNome, "Especialidade", txtEspecialidade,
                 "Telefone *", txtTelefone, "", chkAtivo)), BorderLayout.CENTER);
-        dadosMecanico.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir), BorderLayout.SOUTH);
+        dadosMecanico.add(UI.barraBotoes(btnNovo, btnSalvar, btnExcluir, Box.createHorizontalStrut(20), btnVoltar), BorderLayout.SOUTH);
 
         tabela.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) selecionar();
