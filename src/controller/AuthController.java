@@ -1,13 +1,15 @@
 package controller;
 
 import dao.UsuarioDAO;
+import dao.UsuarioDAOInterface;
 import model.Usuario;
 import util.AppException;
 import util.Util;
 
 /** Regras do login. */
 public class AuthController {
-    private final UsuarioDAO dao = new UsuarioDAO();
+    // o controller conhece só a interface; a classe concreta aparece apenas no "new"
+    private final UsuarioDAOInterface dao = new UsuarioDAO();
 
     /** Retorna o usuário logado ou lança AppException se o login não for válido. */
     public Usuario login(String login, String senha) {
