@@ -8,22 +8,20 @@ import util.Util;
 
 import java.util.List;
 
-/** Regras da tela de serviços: valida os dados e chama o ServicoDAO. */
+/** Regras da tela de serviços. */
 public class ServicoController {
-    // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
+    // declarado pela interface DAO; a classe concreta só aparece no new
     private final DAO<Servico> dao = new ServicoDAO();
 
-    /** Colunas que a tela oferece para ordenar a lista de serviços. */
     public String[] colunas() {
         return dao.colunas();
     }
 
-    /** Lista os serviços que contêm a busca, ordenados pelos critérios escolhidos. */
     public List<Servico> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
 
-    /** id == 0 insere um novo serviço; id > 0 atualiza o existente. */
+    // id 0 = serviço novo (INSERT); senão atualiza (UPDATE)
     public void salvar(int id, String nome, String descricao, String preco, String intervaloKm) {
         if (Util.vazio(nome)) throw new AppException("O nome do serviço é obrigatório.");
         Servico s = new Servico();
@@ -36,7 +34,7 @@ public class ServicoController {
         else dao.atualizar(s);
     }
 
-    /** Exclui o serviço; o banco bloqueia se ele estiver em alguma agenda (RESTRICT). */
+    // o banco não deixa excluir serviço que está na agenda de algum carro (RESTRICT)
     public void excluir(int id) {
         dao.excluir(id);
     }

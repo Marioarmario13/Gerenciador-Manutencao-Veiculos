@@ -4,6 +4,8 @@
 CREATE DATABASE IF NOT EXISTS manutencao_veiculos;
 USE manutencao_veiculos;
 
+-- Apaga primeiro as tabelas que têm chave estrangeira (agenda e carro),
+-- senão o MySQL não deixa apagar as tabelas que elas apontam.
 DROP TABLE IF EXISTS agenda;
 DROP TABLE IF EXISTS carro;
 DROP TABLE IF EXISTS servico;
@@ -13,14 +15,14 @@ DROP TABLE IF EXISTS usuario;
 CREATE TABLE usuario (
     id    INT AUTO_INCREMENT PRIMARY KEY,
     login VARCHAR(30) NOT NULL UNIQUE,
-    senha CHAR(64)    NOT NULL
+    senha CHAR(64)    NOT NULL   -- hash SHA-256 da senha, sempre com 64 caracteres
 );
 
 CREATE TABLE servico (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     nome         VARCHAR(80)   NOT NULL,
     descricao    VARCHAR(200)  NOT NULL DEFAULT '',
-    preco        DECIMAL(10,2) NOT NULL,
+    preco        DECIMAL(10,2) NOT NULL,   -- DECIMAL é exato, bom para dinheiro
     intervalo_km INT           NOT NULL DEFAULT 0
 );
 
@@ -34,26 +36,32 @@ CREATE TABLE mecanico (
 
 CREATE TABLE carro (
     id          INT AUTO_INCREMENT PRIMARY KEY,
-    placa       VARCHAR(7)   NOT NULL UNIQUE,
+    placa       VARCHAR(7)   NOT NULL UNIQUE,   -- gravada sem hífen
     modelo      VARCHAR(60)  NOT NULL,
     ano         INT          NOT NULL,
     km          INT          NOT NULL DEFAULT 0,
     problema    VARCHAR(200) NOT NULL DEFAULT '',
-    mecanico_id INT NULL,
+    mecanico_id INT NULL,   -- NULL = carro sem mecânico
+    -- RESTRICT: não deixa excluir um mecânico que está em algum carro
     CONSTRAINT fk_carro_mecanico FOREIGN KEY (mecanico_id)
         REFERENCES mecanico(id) ON DELETE RESTRICT
 );
 
+-- Tabela de relação (associativa): um carro tem vários serviços e um serviço
+-- é feito em vários carros (muitos para muitos).
 CREATE TABLE agenda (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     carro_id      INT         NOT NULL,
     servico_id    INT         NOT NULL,
     data_agendada DATE        NOT NULL,
     status        ENUM('AGENDADO', 'CONCLUIDO', 'CANCELADO') NOT NULL DEFAULT 'AGENDADO',
+    -- CASCADE: excluir o carro apaga a agenda dele junto
     CONSTRAINT fk_agenda_carro FOREIGN KEY (carro_id)
         REFERENCES carro(id) ON DELETE CASCADE,
+    -- RESTRICT: serviço que está na agenda não pode ser excluído
     CONSTRAINT fk_agenda_servico FOREIGN KEY (servico_id)
         REFERENCES servico(id) ON DELETE RESTRICT,
+    -- o mesmo serviço não pode ser agendado duas vezes no mesmo dia para o mesmo carro
     CONSTRAINT uq_agenda UNIQUE (carro_id, servico_id, data_agendada)
 );
 
@@ -77,5 +85,6 @@ INSERT INTO agenda (carro_id, servico_id, data_agendada, status) VALUES
     (2, 1, '2026-11-12', 'AGENDADO'),
     (2, 4, '2026-11-12', 'AGENDADO');
 
+-- usuário admin, senha admin123 (aqui vai só o hash)
 INSERT INTO usuario (login, senha)
 VALUES ('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9');

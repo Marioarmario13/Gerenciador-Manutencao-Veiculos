@@ -9,18 +9,17 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
-/** Métodos auxiliares de validação e formatação. */
+/** Validação e formatação usadas pelos controllers e pelas telas. */
 public class Util {
 
     private static final DateTimeFormatter FMT =
             DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
-    /** Retorna true se o texto for nulo ou só tiver espaços. */
     public static boolean vazio(String s) {
         return s == null || s.trim().isEmpty();
     }
 
-    /** Converte o texto em número inteiro e confere se está entre min e max. */
+    // usado em ano, km e intervalo: confere se é número e se está entre min e max
     public static int parseInt(String s, String campo, int min, int max) {
         if (vazio(s)) throw new AppException(campo + " é obrigatório.");
         try {
@@ -34,7 +33,7 @@ public class Util {
         }
     }
 
-    /** Aceita "150", "150.50" ou "1.250,50". */
+    // aceita "150", "150.50" ou "1.250,50"
     public static BigDecimal parseDecimal(String s, String campo) {
         if (vazio(s)) throw new AppException(campo + " é obrigatório.");
         String t = s.trim();
@@ -49,7 +48,7 @@ public class Util {
         }
     }
 
-    /** Converte uma data dd/mm/aaaa para o tipo Date do banco. */
+    // a data vem da tela como texto dd/mm/aaaa
     public static Date parseData(String s, String campo) {
         if (vazio(s)) throw new AppException(campo + " é obrigatória.");
         try {
@@ -59,17 +58,15 @@ public class Util {
         }
     }
 
-    /** Mostra uma data do banco no formato dd/mm/aaaa. */
     public static String formatData(Date d) {
         return d == null ? "" : d.toLocalDate().format(FMT);
     }
 
-    /** Data de hoje no formato dd/mm/aaaa. */
     public static String hoje() {
         return LocalDate.now().format(FMT);
     }
 
-    /** Formata um valor em reais, ex.: R$ 1.250,00. */
+    // formato em reais: R$ 1.250,00
     public static String moeda(BigDecimal v) {
         if (v == null) v = BigDecimal.ZERO;
         return String.format(Locale.forLanguageTag("pt-BR"), "R$ %,.2f", v);

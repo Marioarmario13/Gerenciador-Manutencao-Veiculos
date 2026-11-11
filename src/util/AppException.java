@@ -2,20 +2,18 @@ package util;
 
 import java.sql.SQLException;
 
-/** Erro com mensagem pronta para mostrar ao usuário (validação ou erro do banco). */
+/** Erro com a mensagem pronta para mostrar na tela. Herda de RuntimeException. */
 public class AppException extends RuntimeException {
 
-    /** Erro de validação, com a mensagem já pronta para o usuário. */
     public AppException(String mensagem) {
         super(mensagem);
     }
 
-    /** Converte um erro do MySQL em uma mensagem fácil de entender. */
+    // erro do banco: troca o código do MySQL por uma mensagem que o usuário entende
     public AppException(SQLException e) {
         super(traduzir(e));
     }
 
-    /** Escolhe a mensagem de acordo com o código de erro do MySQL. */
     private static String traduzir(SQLException e) {
         String estado = e.getSQLState();
         int codigo = e.getErrorCode();

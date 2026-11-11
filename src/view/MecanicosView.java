@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Cadastro e consulta de mecânicos. */
+/** Tela de cadastro de mecânicos. */
 public class MecanicosView extends JFrame {
     private final MecanicoController ctrl = new MecanicoController();
     private final JTextField txtBusca = new JTextField(14);
@@ -27,7 +27,7 @@ public class MecanicosView extends JFrame {
     private List<Mecanico> dados = new ArrayList<>();
     private int idAtual;
 
-    /** Monta a tela: pesquisa, lista de mecânicos e formulário de dados. */
+    // mesma estrutura da tela de serviços: pesquisa, lista e formulário
     public MecanicosView() {
         super("Cadastro de Mecânicos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -49,7 +49,7 @@ public class MecanicosView extends JFrame {
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
         JButton btnVoltar = new JButton("Voltar");
-        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
+        btnVoltar.addActionListener(e -> dispose()); // fecha só esta tela e volta ao menu
 
         JPanel dadosMecanico = new JPanel(new BorderLayout());
         dadosMecanico.add(UI.secao("Dados do Mecânico", UI.grade(2,
@@ -69,7 +69,6 @@ public class MecanicosView extends JFrame {
         recarregar();
     }
 
-    /** Busca os mecânicos no controller e preenche a tabela. */
     private void recarregar() {
         try {
             dados = ctrl.listar(txtBusca.getText(), (String) cbOrdem1.getSelectedItem(),
@@ -84,7 +83,6 @@ public class MecanicosView extends JFrame {
         }
     }
 
-    /** Copia o mecânico selecionado na tabela para o formulário. */
     private void selecionar() {
         int linha = tabela.getSelectedRow();
         if (linha < 0 || linha >= dados.size()) return;
@@ -96,7 +94,6 @@ public class MecanicosView extends JFrame {
         chkAtivo.setSelected(mecanico.isAtivo());
     }
 
-    /** Limpa o formulário para cadastrar um mecânico novo. */
     private void limpar() {
         idAtual = 0;
         tabela.clearSelection();
@@ -107,7 +104,6 @@ public class MecanicosView extends JFrame {
         txtNome.requestFocus();
     }
 
-    /** Envia o formulário ao controller para inserir ou alterar o mecânico. */
     private void salvar() {
         try {
             ctrl.salvar(idAtual, txtNome.getText(), txtEspecialidade.getText(), txtTelefone.getText(),
@@ -120,7 +116,6 @@ public class MecanicosView extends JFrame {
         }
     }
 
-    /** Pede confirmação e exclui o mecânico selecionado. */
     private void excluir() {
         if (idAtual == 0) {
             UI.erro(this, "Selecione um mecânico na tabela para excluir.");

@@ -1,6 +1,6 @@
 package model;
 
-/** Mecânico da oficina (tabela mecanico). Pode ser atribuído a vários carros. */
+/** Mecânico da oficina (tabela mecanico). */
 public class Mecanico {
     private int id;
     private String nome;

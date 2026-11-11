@@ -19,27 +19,27 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Regras da tela de carros: cadastro do carro e sua agenda de serviços. */
+/** Regras da tela de carros: cadastro do carro e agenda de serviços. */
 public class CarroController {
-    // o controller conhece só a interface DAO; a classe concreta aparece apenas no "new"
+    // Os DAOs são declarados pelo tipo da interface (DAO<...>). O controller só conhece listar,
+    // inserir, atualizar e excluir, e não depende do SQL de cada classe. A classe concreta só
+    // aparece no new (polimorfismo).
     private final DAO<Carro> dao = new CarroDAO();
     private final DAO<Mecanico> mecanicoDAO = new MecanicoDAO();
     private final DAO<Servico> servicoDAO = new ServicoDAO();
     private final DAO<Agendamento> agendaDAO = new AgendamentoDAO();
 
-    // ---------- Carros ----------
+    // carros
 
-    /** Colunas que a tela oferece para ordenar a lista de carros. */
     public String[] colunas() {
         return dao.colunas();
     }
 
-    /** Lista os carros que contêm a busca, ordenados pelos critérios escolhidos. */
     public List<Carro> listar(String busca, String ordem1, String ordem2) {
         return dao.listar(busca, ordem1, ordem2);
     }
 
-    /** Mecânicos em atividade, em ordem de nome (para o combo "Mecânico"). */
+    // só os mecânicos ativos aparecem no combo da tela de carros
     public List<Mecanico> mecanicosAtivos() {
         List<Mecanico> ativos = new ArrayList<>();
         for (Mecanico m : mecanicoDAO.listar("", "Nome", null)) {
@@ -48,7 +48,7 @@ public class CarroController {
         return ativos;
     }
 
-    /** id == 0 insere um novo carro; id > 0 atualiza o existente. */
+    // id 0 = carro novo (INSERT); id maior que 0 = carro que já existe (UPDATE)
     public void salvar(int id, String placa, String modelo, String ano, String km, String problema,
                        Mecanico mecanico) {
         if (Util.vazio(placa)) throw new AppException("A placa é obrigatória.");
@@ -70,19 +70,18 @@ public class CarroController {
         else dao.atualizar(c);
     }
 
-    /** Exclui o carro; a agenda dele é apagada junto (CASCADE no banco). */
+    // a agenda do carro é apagada junto pelo banco (ON DELETE CASCADE)
     public void excluir(int id) {
         dao.excluir(id);
     }
 
-    // ---------- Agenda de serviços do carro ----------
+    // agenda do carro
 
-    /** Serviços em ordem de nome, para o combo da agenda. */
     public List<Servico> servicos() {
         return servicoDAO.listar("", "Nome", null);
     }
 
-    /** Agenda de um carro, em ordem de data e depois de serviço. */
+    // busca a agenda pela interface e separa só a deste carro
     public List<Agendamento> listarAgenda(int carroId) {
         List<Agendamento> doCarro = new ArrayList<>();
         for (Agendamento a : agendaDAO.listar("", "Data", "Serviço")) {
@@ -91,7 +90,8 @@ public class CarroController {
         return doCarro;
     }
 
-    /** Soma o preço dos serviços ainda agendados (os concluídos e cancelados não entram). */
+    // Regra de negócio fica no controller (MVC): soma só o que ainda está agendado.
+    // A tela só mostra o valor.
     public BigDecimal totalPrevisto(List<Agendamento> agenda) {
         BigDecimal total = BigDecimal.ZERO;
         for (Agendamento a : agenda) {
@@ -100,7 +100,6 @@ public class CarroController {
         return total;
     }
 
-    /** Valida o serviço e a data (que não pode estar no passado) e grava o agendamento. */
     public void agendar(int carroId, Servico servico, String data) {
         if (carroId == 0) throw new AppException("Selecione um carro na tabela primeiro.");
         if (servico == null) throw new AppException("Selecione um serviço.");
@@ -116,13 +115,12 @@ public class CarroController {
         agendaDAO.inserir(a);
     }
 
-    /** Marca o agendamento como concluído ou cancelado. */
+    // concluir ou cancelar um serviço da agenda
     public void mudarStatus(Agendamento agendamento, String status) {
         agendamento.setStatus(status);
         agendaDAO.atualizar(agendamento);
     }
 
-    /** Remove um serviço da agenda do carro. */
     public void removerDaAgenda(int agendamentoId) {
         agendaDAO.excluir(agendamentoId);
     }

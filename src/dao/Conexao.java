@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-/** Cria conexões JDBC com o MySQL. Lê config.properties (se existir). */
+/** Conexão com o MySQL e métodos de apoio usados pelos DAOs. */
 public class Conexao {
 
     private static String url = "jdbc:mysql://localhost:3306/manutencao_veiculos";
@@ -37,15 +37,15 @@ public class Conexao {
         }
     }
 
-    /** Abre uma nova conexão com o MySQL usando os dados do config.properties. */
+    // usa o endereço, o usuário e a senha do config.properties
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, usuario, senha);
     }
 
-    /**
-     * Executa um INSERT, UPDATE ou DELETE. Cada valor ocupa um "?" do SQL, na ordem.
-     * Exemplo: executar("DELETE FROM carro WHERE id = ?", 5);
-     */
+    // Usado nos INSERT, UPDATE e DELETE. Cada ? do SQL recebe um valor, na ordem:
+    // executar("DELETE FROM carro WHERE id = ?", 5) roda DELETE FROM carro WHERE id = 5.
+    // Os valores vão separados do comando, então o que o usuário digita nunca vira
+    // parte do SQL. É isso que evita o SQL injection.
     static void executar(String sql, Object... valores) {
         try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             for (int i = 0; i < valores.length; i++) ps.setObject(i + 1, valores[i]);
@@ -55,10 +55,8 @@ public class Conexao {
         }
     }
 
-    /**
-     * Monta o ORDER BY com até dois critérios escolhidos na tela.
-     * Só aceita colunas do mapa (rótulo na tela -> coluna SQL), o que evita SQL injection.
-     */
+    // Monta o ORDER BY. O ? não serve para nome de coluna, então só entram colunas
+    // que estão no mapa COLUNAS de cada DAO. Assim não dá para injetar SQL pela ordenação.
     static String ordenarPor(Map<String, String> colunasPermitidas, String criterio1, String criterio2) {
         List<String> colunas = new ArrayList<>();
         for (String criterio : new String[]{criterio1, criterio2}) {

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Tela de serviços: cadastro, consulta e preços. */
+/** Tela de cadastro de serviços. */
 public class ServicosView extends JFrame {
     private final ServicoController ctrl = new ServicoController();
 
@@ -30,7 +30,8 @@ public class ServicosView extends JFrame {
     private List<Servico> dados = new ArrayList<>();
     private int idAtual = 0;   // 0 = novo serviço
 
-    /** Monta a tela: pesquisa, lista de serviços e formulário de dados. */
+    // Cada tela é uma classe que herda de JFrame (a janela do Swing) e se monta no construtor.
+    // DISPOSE_ON_CLOSE: o X fecha só esta tela; o menu continua aberto.
     public ServicosView() {
         super("Cadastro de Serviços de Manutenção");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -43,16 +44,18 @@ public class ServicosView extends JFrame {
         btnBuscar.addActionListener(e -> recarregar());
         txtBusca.addActionListener(e -> recarregar());
         btnLimpar.addActionListener(e -> txtBusca.setText(""));
+        // filtro: a cada letra digitada ou apagada a lista é recarregada (ver UI.buscarAoDigitar)
         UI.buscarAoDigitar(txtBusca, this::recarregar);
 
         JButton btnNovo = new JButton("Novo");
         JButton btnSalvar = new JButton("Salvar");
         JButton btnExcluir = new JButton("Excluir");
+        // cada botão chama um método quando é clicado (e -> ... é uma lambda)
         btnNovo.addActionListener(e -> limpar());
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
         JButton btnVoltar = new JButton("Voltar");
-        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
+        btnVoltar.addActionListener(e -> dispose()); // fecha só esta tela e volta ao menu
 
         JPanel sul = new JPanel(new BorderLayout());
         sul.add(UI.secao("Dados do Serviço", UI.grade(2,
@@ -64,6 +67,7 @@ public class ServicosView extends JFrame {
             if (!e.getValueIsAdjusting()) selecionar();
         });
 
+        // BorderLayout: pesquisa em cima (NORTH), tabela no meio (CENTER), formulário embaixo (SOUTH)
         JPanel conteudo = new JPanel(new BorderLayout(0, 4));
         conteudo.add(UI.painelBusca(txtBusca, cbOrdem1, cbOrdem2, btnBuscar, btnLimpar), BorderLayout.NORTH);
         conteudo.add(UI.rolagem(tabela), BorderLayout.CENTER);
@@ -73,7 +77,7 @@ public class ServicosView extends JFrame {
         recarregar();
     }
 
-    /** Busca os serviços no controller e preenche a tabela. */
+    // pede a lista ao controller (com o texto da busca e a ordenação) e refaz a tabela
     private void recarregar() {
         try {
             dados = ctrl.listar(txtBusca.getText(), (String) cbOrdem1.getSelectedItem(),
@@ -88,7 +92,7 @@ public class ServicosView extends JFrame {
         }
     }
 
-    /** Copia o serviço selecionado na tabela para o formulário. */
+    // copia a linha clicada para o formulário
     private void selecionar() {
         int i = tabela.getSelectedRow();
         if (i < 0 || i >= dados.size()) return;
@@ -100,7 +104,6 @@ public class ServicosView extends JFrame {
         txtIntervalo.setText(String.valueOf(s.getIntervaloKm()));
     }
 
-    /** Limpa o formulário para cadastrar um serviço novo. */
     private void limpar() {
         idAtual = 0;
         tabela.clearSelection();
@@ -111,7 +114,6 @@ public class ServicosView extends JFrame {
         txtNome.requestFocus();
     }
 
-    /** Envia o formulário ao controller para inserir ou alterar o serviço. */
     private void salvar() {
         try {
             ctrl.salvar(idAtual, txtNome.getText(), txtDescricao.getText(), txtPreco.getText(), txtIntervalo.getText());
@@ -123,7 +125,6 @@ public class ServicosView extends JFrame {
         }
     }
 
-    /** Pede confirmação e exclui o serviço selecionado. */
     private void excluir() {
         if (idAtual == 0) {
             UI.erro(this, "Selecione um serviço na tabela para excluir.");

@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela mecanico: implementa o contrato DAO<Mecanico>. */
+/** DAO da tabela mecanico. */
 public class MecanicoDAO implements DAO<Mecanico> {
 
-    /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
+    // opções de "Ordenar por": nome na tela -> coluna no SQL
     private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Nome", "nome");
@@ -34,6 +34,7 @@ public class MecanicoDAO implements DAO<Mecanico> {
         String sql = "SELECT id, nome, especialidade, telefone, ativo FROM mecanico "
                 + "WHERE nome LIKE ? OR especialidade LIKE ? OR telefone LIKE ? "
                 + "OR CAST(id AS CHAR) LIKE ? "
+                // deixa buscar "Sim" ou "Não" na coluna Em atividade
                 + "OR CASE WHEN ativo = TRUE THEN 'Sim' ELSE 'Não' END LIKE ? "
                 + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
         List<Mecanico> lista = new ArrayList<>();

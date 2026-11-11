@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Cadastro de carros, mecânicos atribuídos e agenda de serviços. */
+/** Tela de carros: cadastro, mecânico atribuído e agenda de serviços. */
 public class CarrosView extends JFrame {
     private static final Mecanico NENHUM = criarNenhum();
 
@@ -47,7 +47,7 @@ public class CarrosView extends JFrame {
     private final JTextField txtData = new JTextField(Util.hoje(), 9);
     private final JLabel lblTotal = new JLabel();
 
-    /** Monta a tela: critérios de pesquisa, lista de carros e as abas de dados e agenda. */
+    // pesquisa em cima, lista de carros no meio e as abas (dados e agenda) embaixo
     public CarrosView() {
         super("Carros e Agenda de Serviços");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -58,8 +58,8 @@ public class CarrosView extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
-                // atualiza os combos ao voltar para a tela (ex.: depois de cadastrar um serviço);
-                // aqui o erro não é mostrado, senão a mensagem reapareceria a cada vez que a janela ganha foco
+                // recarrega os combos quando a janela volta a ter foco (ex.: cadastrou um serviço em outra tela).
+                // O erro não aparece aqui, senão o aviso voltaria toda vez que a janela ganha foco.
                 try {
                     carregarCombos();
                 } catch (AppException ignorada) {
@@ -81,7 +81,7 @@ public class CarrosView extends JFrame {
         btnSalvar.addActionListener(e -> salvarCarro());
         btnExcluir.addActionListener(e -> excluirCarro());
         JButton btnVoltar = new JButton("Voltar");
-        btnVoltar.addActionListener(e -> dispose()); // fecha a tela e volta ao menu principal
+        btnVoltar.addActionListener(e -> dispose()); // fecha só esta tela e volta ao menu
 
         JPanel abaCarro = new JPanel(new BorderLayout());
         abaCarro.add(UI.grade(3,
@@ -142,7 +142,7 @@ public class CarrosView extends JFrame {
         carregarAgenda();
     }
 
-    /** Item "(sem mecânico)" do combo, com id 0. */
+    // item "(sem mecânico)" do combo
     private static Mecanico criarNenhum() {
         Mecanico mecanico = new Mecanico();
         mecanico.setId(0);
@@ -150,7 +150,7 @@ public class CarrosView extends JFrame {
         return mecanico;
     }
 
-    /** Preenche os combos de mecânico e serviço, mantendo o que estava selecionado. */
+    // recarrega os combos sem perder o que estava selecionado
     private void carregarCombos() {
         Mecanico mecanicoSelecionado = (Mecanico) cbMecanico.getSelectedItem();
         Servico servicoSelecionado = (Servico) cbServico.getSelectedItem();
@@ -171,7 +171,7 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Seleciona o mecânico no combo; se ele estiver inativo, acrescenta-o à lista. */
+    // mecânico inativo não está no combo, então é acrescentado para aparecer no carro
     private void selecionarMecanico(Mecanico alvo) {
         if (alvo == null || alvo.getId() == 0) {
             cbMecanico.setSelectedItem(NENHUM);
@@ -187,7 +187,6 @@ public class CarrosView extends JFrame {
         cbMecanico.setSelectedItem(alvo);
     }
 
-    /** Busca os carros no controller e preenche a tabela. */
     private void recarregar() {
         try {
             carros = ctrl.listar(txtBusca.getText(), (String) cbOrdem1.getSelectedItem(),
@@ -203,7 +202,7 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Copia o carro selecionado na tabela para o formulário e carrega a agenda dele. */
+    // copia o carro clicado para o formulário e carrega a agenda dele
     private void selecionarCarro() {
         int linha = tabelaCarros.getSelectedRow();
         if (linha < 0 || linha >= carros.size()) return;
@@ -226,7 +225,6 @@ public class CarrosView extends JFrame {
         carregarAgenda();
     }
 
-    /** Limpa o formulário para cadastrar um carro novo. */
     private void limparForm() {
         idCarro = 0;
         tabelaCarros.clearSelection();
@@ -240,7 +238,6 @@ public class CarrosView extends JFrame {
         txtPlaca.requestFocus();
     }
 
-    /** Envia o formulário ao controller para inserir ou alterar o carro. */
     private void salvarCarro() {
         try {
             ctrl.salvar(idCarro, txtPlaca.getText(), txtModelo.getText(), txtAno.getText(), txtKm.getText(),
@@ -253,7 +250,6 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Pede confirmação e exclui o carro selecionado. */
     private void excluirCarro() {
         if (idCarro == 0) {
             UI.erro(this, "Selecione um carro na tabela para excluir.");
@@ -269,7 +265,7 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Preenche a tabela da agenda do carro selecionado e mostra o total previsto. */
+    // o total previsto vem do controller; a tela só mostra
     private void carregarAgenda() {
         modeloAgenda.setRowCount(0);
         agenda.clear();
@@ -292,7 +288,6 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Agenda o serviço escolhido na data informada. */
     private void agendar() {
         try {
             ctrl.agendar(idCarro, (Servico) cbServico.getSelectedItem(), txtData.getText());
@@ -302,7 +297,6 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Item selecionado na tabela da agenda, ou null (com aviso) se nenhum foi escolhido. */
     private Agendamento agendamentoSelecionado() {
         int linha = tabelaAgenda.getSelectedRow();
         if (linha < 0 || linha >= agenda.size()) {
@@ -312,7 +306,6 @@ public class CarrosView extends JFrame {
         return agenda.get(linha);
     }
 
-    /** Marca o item selecionado da agenda como concluído ou cancelado. */
     private void mudarStatus(String status) {
         Agendamento item = agendamentoSelecionado();
         if (item == null) return;
@@ -324,7 +317,6 @@ public class CarrosView extends JFrame {
         }
     }
 
-    /** Pede confirmação e remove o item selecionado da agenda. */
     private void removerAgenda() {
         Agendamento item = agendamentoSelecionado();
         if (item == null || !UI.confirmar(this, "Remover este serviço da agenda?")) return;

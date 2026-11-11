@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela servico: implementa o contrato DAO<Servico>. */
+/** DAO da tabela servico. */
 public class ServicoDAO implements DAO<Servico> {
 
-    /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
+    // opções de "Ordenar por": nome na tela -> coluna no SQL
     private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Nome", "nome");
@@ -37,10 +37,14 @@ public class ServicoDAO implements DAO<Servico> {
                 + "OR CAST(intervalo_km AS CHAR) LIKE ? OR CAST(id AS CHAR) LIKE ?"
                 + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
         List<Servico> lista = new ArrayList<>();
+        // try com recursos: a conexão e o comando são fechados sozinhos no final, mesmo se der erro
         try (Connection c = Conexao.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            // % é o coringa do LIKE: "%troca%" encontra qualquer texto que tenha "troca".
+            // Com a busca vazia fica "%%", que traz tudo. O mesmo filtro vai em cada ?.
             String filtro = "%" + (busca == null ? "" : busca.trim()) + "%";
             for (int i = 1; i <= 6; i++) ps.setString(i, filtro);
             try (ResultSet rs = ps.executeQuery()) {
+                // cada linha do resultado (ResultSet) vira um objeto Servico
                 while (rs.next()) {
                     Servico s = new Servico();
                     s.setId(rs.getInt("id"));
@@ -52,6 +56,7 @@ public class ServicoDAO implements DAO<Servico> {
                 }
             }
         } catch (SQLException e) {
+            // o erro do MySQL vira uma mensagem em português (ver AppException)
             throw new AppException(e);
         }
         return lista;

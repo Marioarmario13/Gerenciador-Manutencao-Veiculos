@@ -11,10 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/** Acesso à tabela usuario: implementa o contrato do login (UsuarioDAOInterface). */
-public class UsuarioDAO implements UsuarioDAOInterface {
+/** DAO da tabela usuario. Não implementa DAO<T> porque o sistema não cadastra usuários, só confere o login. */
+public class UsuarioDAO {
 
-    @Override
+    // devolve o usuário se o login e a senha baterem, ou null
     public Usuario autenticar(String login, String senha) {
         String sql = "SELECT id, login FROM usuario WHERE login = ? AND senha = ?";
         try (Connection conexao = Conexao.getConnection();
@@ -33,7 +33,7 @@ public class UsuarioDAO implements UsuarioDAOInterface {
         }
     }
 
-    /** A senha é guardada no banco como hash SHA-256 (64 caracteres hexadecimais). */
+    // a senha nunca fica salva em texto: o banco guarda o hash SHA-256 dela
     private String hashSenha(String senha) {
         try {
             byte[] hash = MessageDigest.getInstance("SHA-256").digest(senha.getBytes(StandardCharsets.UTF_8));

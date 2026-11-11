@@ -3,13 +3,12 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-/** Menu principal com acesso às telas. */
+/** Menu principal. */
 public class PrincipalView extends JFrame {
     private ServicosView servicos;
     private MecanicosView mecanicos;
     private CarrosView carros;
 
-    /** Monta o menu principal com os botões das três telas de cadastro. */
     public PrincipalView() {
         super("ManuPrev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -39,21 +38,19 @@ public class PrincipalView extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    /** Abre a tela de carros, ou traz para a frente se já estiver aberta. */
+    // reaproveita a tela se ela já estiver aberta; se foi fechada, cria outra
     private void abrirCarros() {
         if (carros == null || !carros.isDisplayable()) carros = new CarrosView();
         carros.setVisible(true);
         carros.toFront();
     }
 
-    /** Abre a tela de serviços, ou traz para a frente se já estiver aberta. */
     private void abrirServicos() {
         if (servicos == null || !servicos.isDisplayable()) servicos = new ServicosView();
         servicos.setVisible(true);
         servicos.toFront();
     }
 
-    /** Abre a tela de mecânicos, ou traz para a frente se já estiver aberta. */
     private void abrirMecanicos() {
         if (mecanicos == null || !mecanicos.isDisplayable()) mecanicos = new MecanicosView();
         mecanicos.setVisible(true);

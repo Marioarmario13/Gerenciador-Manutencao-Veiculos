@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela de relação agenda (carro x serviço): implementa o contrato DAO<Agendamento>. */
+/** DAO da tabela agenda (ligação entre carro e serviço). */
 public class AgendamentoDAO implements DAO<Agendamento> {
 
-    /** Critérios de ordenação disponíveis (rótulo -> coluna SQL). */
+    // opções de ordenação: nome -> coluna no SQL
     private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Data", "a.data_agendada");

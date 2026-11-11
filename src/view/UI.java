@@ -9,7 +9,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-/** Utilitários para montar as telas no estilo de sistema corporativo (ERP clássico). */
+/** Funções que montam as telas e o tema visual (estilo de sistema de empresa). */
 public class UI {
     static final Color FUNDO = new Color(224, 224, 224);
     static final Color CAMPO = new Color(224, 255, 255);
@@ -20,7 +20,7 @@ public class UI {
     private static final Font FONTE = new Font("Tahoma", Font.PLAIN, 11);
     private static final Font FONTE_NEGRITO = new Font("Tahoma", Font.BOLD, 11);
 
-    /** Visual cinza simples, campos em ciano claro e texto azul-marinho. */
+    // configura o visual de todas as telas de uma vez, pelo UIManager
     public static void instalarTema() {
         try {
             MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
@@ -75,7 +75,7 @@ public class UI {
         UIManager.put("OptionPane.errorIcon", new IconeAviso('x'));
     }
 
-    /** Ícones das caixas de mensagem desenhados no estilo do Windows 7 (com brilho e degradê). */
+    // ícones das caixas de aviso, desenhados no estilo do Windows 7
     private static class IconeAviso implements Icon {
         private final char tipo;
 
@@ -130,7 +130,6 @@ public class UI {
             g.dispose();
         }
 
-        /** Desenha o símbolo (!, i ou ?) centralizado no ícone. */
         private static void simbolo(Graphics2D g, String texto, Color cor, int base) {
             g.setFont(new Font("Times New Roman", Font.BOLD, 20));
             g.setColor(cor);
@@ -141,7 +140,8 @@ public class UI {
         }
     }
 
-    /** Executa a ação a cada letra digitada no campo (busca enquanto digita). */
+    // Filtro da busca: o DocumentListener é avisado sempre que o texto do campo muda
+    // (letra digitada ou apagada) e chama a ação, que é o recarregar() da tela.
     static void buscarAoDigitar(JTextField campo, Runnable acao) {
         campo.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -161,23 +161,21 @@ public class UI {
         });
     }
 
-    /** Mostra uma caixa de aviso com a mensagem. */
     static void erro(Component pai, String mensagem) {
         JOptionPane.showMessageDialog(pai, mensagem, "Atenção", JOptionPane.WARNING_MESSAGE);
     }
 
-    /** Mostra uma caixa de informação com a mensagem. */
     static void info(Component pai, String mensagem) {
         JOptionPane.showMessageDialog(pai, mensagem, "Informação", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /** Pergunta Sim/Não e retorna true se o usuário confirmar. */
+    // confirmação com os botões Yes/No; devolve true se o usuário confirmar
     static boolean confirmar(Component pai, String mensagem) {
         return JOptionPane.showConfirmDialog(pai, mensagem, "Confirmação",
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
-    /** Modelo de tabela somente leitura. */
+    // tabela só de leitura
     static DefaultTableModel modelo(String... colunas) {
         return new DefaultTableModel(colunas, 0) {
             @Override
@@ -187,7 +185,6 @@ public class UI {
         };
     }
 
-    /** Cria uma tabela de seleção única, sem reordenar colunas. */
     static JTable tabela(DefaultTableModel modelo) {
         JTable t = new JTable(modelo);
         t.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -198,7 +195,6 @@ public class UI {
         return t;
     }
 
-    /** Coloca a tabela dentro de uma área de rolagem com borda. */
     static JScrollPane rolagem(JTable tabela) {
         JScrollPane s = new JScrollPane(tabela);
         s.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -206,7 +202,7 @@ public class UI {
         return s;
     }
 
-    /** Quadro com título vermelho centralizado, como "Critérios para Seleção dos Dados". */
+    // quadro com título vermelho, como "Critérios de Pesquisa"
     static JPanel secao(String titulo, JComponent conteudo) {
         JPanel p = new JPanel(new BorderLayout());
         TitledBorder borda = BorderFactory.createTitledBorder(
@@ -217,10 +213,7 @@ public class UI {
         return p;
     }
 
-    /**
-     * Formulário em grade: pares (rótulo, campo) lado a lado, com o rótulo à direita
-     * alinhado e terminando em ":". {@code pares} indica quantos pares cabem em cada linha.
-     */
+    // formulário com rótulo à esquerda e campo à direita; "pares" = quantos pares por linha
     static JPanel grade(int pares, Object... rotulosECampos) {
         JPanel p = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -246,7 +239,6 @@ public class UI {
         return p;
     }
 
-    /** Barra de botões alinhada à direita, separada por uma linha. */
     static JPanel barraBotoes(Component... itens) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
         p.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, BORDA));
@@ -254,7 +246,6 @@ public class UI {
         return p;
     }
 
-    /** Linha de rótulo + componentes, alinhada à esquerda. */
     static JPanel linha(Object... itens) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         for (Object item : itens) {
@@ -263,7 +254,7 @@ public class UI {
         return p;
     }
 
-    /** Critérios de pesquisa no topo das telas de cadastro. */
+    // quadro de pesquisa do topo das telas de cadastro
     static JPanel painelBusca(JTextField busca, JComboBox<String> ordem1, JComboBox<String> ordem2,
                               JButton btnBuscar, JButton btnLimpar) {
         busca.setColumns(24);
@@ -273,7 +264,6 @@ public class UI {
         return secao("Critérios de Pesquisa", linhas);
     }
 
-    /** Raiz padrão de uma janela, com margem pequena. */
     static JPanel raiz(JComponent conteudo) {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));

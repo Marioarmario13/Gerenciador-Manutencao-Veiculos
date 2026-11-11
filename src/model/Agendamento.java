@@ -3,7 +3,7 @@ package model;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-/** Relação entre um carro e um serviço na agenda. */
+/** Serviço agendado para um carro (tabela agenda). */
 public class Agendamento {
     public static final String AGENDADO = "AGENDADO";
     public static final String CONCLUIDO = "CONCLUIDO";
@@ -32,7 +32,7 @@ public class Agendamento {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    /** Status escrito para a tela, com acento: Agendado, Concluído ou Cancelado. */
+    // status com acento, para mostrar na tela
     public String getStatusTexto() {
         if (CONCLUIDO.equals(status)) return "Concluído";
         if (CANCELADO.equals(status)) return "Cancelado";

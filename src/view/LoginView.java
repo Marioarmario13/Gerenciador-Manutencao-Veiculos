@@ -12,7 +12,6 @@ public class LoginView extends JFrame {
     private final JTextField txtLogin = new JTextField(26);
     private final JPasswordField txtSenha = new JPasswordField(26);
 
-    /** Monta a tela de login com usuário e senha. */
     public LoginView() {
         super("ManuPrev");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -35,7 +34,7 @@ public class LoginView extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    /** Confere o login no controller e, se estiver certo, abre o menu principal. */
+    // se o login estiver certo, fecha esta janela e abre o menu
     private void entrar() {
         try {
             ctrl.login(txtLogin.getText(), new String(txtSenha.getPassword()));

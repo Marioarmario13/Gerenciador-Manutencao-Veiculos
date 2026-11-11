@@ -1,17 +1,16 @@
 package controller;
 
 import dao.UsuarioDAO;
-import dao.UsuarioDAOInterface;
 import model.Usuario;
 import util.AppException;
 import util.Util;
 
 /** Regras do login. */
 public class AuthController {
-    // o controller conhece só a interface; a classe concreta aparece apenas no "new"
-    private final UsuarioDAOInterface dao = new UsuarioDAO();
+    // O UsuarioDAO não usa a interface DAO<T> porque o login não é um cadastro: só confere usuário e senha.
+    private final UsuarioDAO dao = new UsuarioDAO();
 
-    /** Retorna o usuário logado ou lança AppException se o login não for válido. */
+    // se faltar dado ou a senha estiver errada, lança AppException com a mensagem
     public Usuario login(String login, String senha) {
         if (Util.vazio(login) || Util.vazio(senha)) {
             throw new AppException("Informe usuário e senha.");

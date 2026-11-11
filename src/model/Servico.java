@@ -3,7 +3,7 @@ package model;
 import java.math.BigDecimal;
 import util.Util;
 
-/** Serviço de manutenção oferecido (tabela servico). */
+/** Serviço de manutenção (tabela servico). */
 public class Servico {
     private int id;
     private String nome;
@@ -22,7 +22,7 @@ public class Servico {
     public int getIntervaloKm() { return intervaloKm; }
     public void setIntervaloKm(int intervaloKm) { this.intervaloKm = intervaloKm; }
 
-    /** Texto exibido nos combos. */
+    // texto que aparece no combo de serviços
     @Override
     public String toString() {
         return nome + " (" + Util.moeda(preco) + ")";

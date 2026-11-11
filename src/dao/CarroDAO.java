@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Acesso à tabela carro: implementa o contrato DAO<Carro>. */
+/** DAO da tabela carro. */
 public class CarroDAO implements DAO<Carro> {
 
-    /** Critérios de ordenação disponíveis (rótulo na tela -> coluna SQL). */
+    // opções de "Ordenar por": nome na tela -> coluna no SQL
     private static final Map<String, String> COLUNAS = new LinkedHashMap<>();
     static {
         COLUNAS.put("Placa", "c.placa");
@@ -43,7 +43,7 @@ public class CarroDAO implements DAO<Carro> {
                 + Conexao.ordenarPor(COLUNAS, ordem1, ordem2);
         List<Carro> lista = new ArrayList<>();
         try (Connection c = Conexao.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            // a busca também aceita placa com hífen digitado pelo usuário
+            // tira o hífen porque a placa é gravada sem ele (ABC-1D23 encontra ABC1D23)
             String filtro = "%" + (busca == null ? "" : busca.trim().replace("-", "")) + "%";
             for (int i = 1; i <= 7; i++) ps.setString(i, filtro);
             try (ResultSet rs = ps.executeQuery()) {
@@ -79,12 +79,11 @@ public class CarroDAO implements DAO<Carro> {
                 car.getId());
     }
 
-    /** Sem mecânico (id 0) é gravado como NULL no banco. */
+    // carro sem mecânico (id 0) vai como NULL para o banco
     private Integer mecanico(Carro car) {
         return car.getMecanicoId() == 0 ? null : car.getMecanicoId();
     }
 
-    /** Remove o carro e sua agenda (ON DELETE CASCADE). */
     @Override
     public void excluir(int id) {
         Conexao.executar("DELETE FROM carro WHERE id = ?", id);

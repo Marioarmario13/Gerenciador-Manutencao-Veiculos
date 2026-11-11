@@ -1,7 +1,8 @@
 package model;
 
-/** Carro do cliente (tabela carro). Pode ter um mecânico atribuído. */
+/** Carro do cliente (tabela carro). */
 public class Carro {
+    // atributos privados, acessados só pelos get/set (encapsulamento)
     private int id;
     private String placa;
     private String modelo;
@@ -28,7 +29,7 @@ public class Carro {
     public String getMecanicoNome() { return mecanicoNome; }
     public void setMecanicoNome(String mecanicoNome) { this.mecanicoNome = mecanicoNome; }
 
-    /** ABC1D23 -> ABC-1D23 */
+    // coloca o hífen só para mostrar: ABC1D23 -> ABC-1D23
     public String getPlacaFormatada() {
         return placa != null && placa.length() == 7 ? placa.substring(0, 3) + "-" + placa.substring(3) : placa;
     }
